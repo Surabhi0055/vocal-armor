@@ -6,3 +6,5 @@ tensorflow
 jupyter
 tqdm
 pandas
+joblib
+pillow
