@@ -64,14 +64,16 @@ def predict_voice(audio_path, model):
     img_array = preprocess_audio(audio_path)
     print("Running neural network...")
     prediction = model.predict(img_array, verbose=0)
-    score = prediction[0,0]
+    score = float(prediction[0,0])
+    
     if score > 0.5:
         confidence = score * 100
         print(f"RESULT: REAL HUMAN VOICE (Confidence: {confidence:.2f}%)")
+        return {"prediction": "REAL", "confidence": round(confidence, 2)}
     else:
         confidence = (1.0 - score) * 100
         print(f"RESULT: AI DEEPFAKE DETECTED (Confidence: {confidence:.2f}%)")
-
+        return {"prediction": "FAKE", "confidence": round(confidence, 2)}
 
 if __name__ == "__main__":
     engine = load_vocal_armor()

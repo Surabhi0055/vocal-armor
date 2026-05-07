@@ -3,12 +3,16 @@ import uvicorn
 import shutil
 import os
 import tempfile
+from predict import load_vocal_armor, predict_voice
 
 app = FastAPI(
     title="Vocal-Armor API",
     description="Backend API for real-time deepfake voice detection.",
     version="1.0"
 )
+
+# Load the neural network into memory exactly once when the server starts
+engine = load_vocal_armor()
 
 @app.get("/")
 def read_root():
@@ -22,10 +26,17 @@ async def predict_audio(file: UploadFile = File(...)):
     with open(temp_audio_path, "wb") as buffer:
         shutil.copyfileobj(file.file, buffer)
         
+    # Send the saved file to our Neural Network!
+    result = predict_voice(temp_audio_path, engine)
+    
+    # Clean up the temporary file
+    os.remove(temp_audio_path)
+    
     return {
         "status": "success",
         "filename": file.filename,
-        "message": "Audio file received and saved successfully!"
+        "prediction": result["prediction"],
+        "confidence": result["confidence"]
     }
 
 if __name__ == "__main__":
