@@ -26,7 +26,6 @@ async def predict_audio(file: UploadFile = File(...)):
     with open(temp_audio_path, "wb") as buffer:
         shutil.copyfileobj(file.file, buffer)
         
-    # Send the saved file to our Neural Network!
     result = predict_voice(temp_audio_path, engine)
     
     # Clean up the temporary file

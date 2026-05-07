@@ -50,7 +50,6 @@ def preprocess_audio (audio_path):
     img = img.resize((224, 224), resample=Image.LANCZOS)
     img.save(temp)
 
-    # Load and preprocess exactly like ImageDataGenerator
     loaded_img = tf.keras.utils.load_img(temp, target_size=(128, 128))
     img_array = tf.keras.utils.img_to_array(loaded_img)
     img_array = img_array / 255.0
