@@ -98,6 +98,10 @@ const Dashboard = () => {
   // Draw idle bars on mount
   useEffect(() => { drawIdle(); return () => stopVisualizer(); }, [drawIdle, stopVisualizer]);
 
+  const [dragActive, setDragActive] = useState(false);
+  const [activeTab, setActiveTab] = useState("file"); // "file" | "url"
+  const [url, setUrl] = useState("");
+
   // ── File handlers ─────────────────────────────────────────────────────────
   const handleBrowseClick = () => fileInputRef.current.click();
 
@@ -110,9 +114,22 @@ const Dashboard = () => {
     }
   };
 
+  const handleDrag = (e) => {
+    e.preventDefault();
+    e.stopPropagation();
+    if (e.type === "dragenter" || e.type === "dragover") {
+      setDragActive(true);
+    } else if (e.type === "dragleave") {
+      setDragActive(false);
+    }
+  };
+
   const handleDrop = (e) => {
     e.preventDefault();
-    if (e.dataTransfer.files.length > 0) {
+    e.stopPropagation();
+    setDragActive(false);
+    if (activeTab !== "file") return;
+    if (e.dataTransfer.files && e.dataTransfer.files.length > 0) {
       setFile(e.dataTransfer.files[0]);
       setResult(null);
       stopVisualizer();
@@ -122,21 +139,31 @@ const Dashboard = () => {
 
   // ── Analyze ───────────────────────────────────────────────────────────────
   const handleAnalyze = async () => {
-    if (!file) return;
+    if (activeTab === "file" && !file) return;
+    if (activeTab === "url" && !url.trim()) return;
+    
     setIsAnalyzing(true);
     setResult(null);
 
-    // Start live visualizer
-    startVisualizer(file);
-
-    const formData = new FormData();
-    formData.append("file", file);
-
     try {
-      const response = await fetch("http://127.0.0.1:8000/predict", {
-        method: "POST",
-        body: formData,
-      });
+      let response;
+      if (activeTab === "file") {
+        startVisualizer(file);
+        const formData = new FormData();
+        formData.append("file", file);
+        response = await fetch("http://127.0.0.1:8000/predict", {
+          method: "POST",
+          body: formData,
+        });
+      } else {
+        // Stop visualizer if running
+        stopVisualizer();
+        drawIdle();
+        response = await fetch(`http://127.0.0.1:8000/predict-url?url=${encodeURIComponent(url)}`, {
+          method: "POST",
+        });
+      }
+
       const data = await response.json();
       if (!response.ok) throw new Error(data.detail || "Analysis failed");
       setResult(data);
@@ -145,7 +172,6 @@ const Dashboard = () => {
       alert("Error analyzing audio: " + err.message);
     } finally {
       setIsAnalyzing(false);
-      // Let visualizer keep playing; it'll stop naturally when audio ends
     }
   };
 
@@ -185,6 +211,31 @@ const Dashboard = () => {
 
       {/* ── Upload Container ── */}
       <div className="upload-container">
+        
+        {/* Tabs */}
+        <div style={{ display: "flex", gap: "16px", marginBottom: "20px", borderBottom: "1px solid rgba(255,255,255,0.1)", paddingBottom: "12px" }}>
+          <button 
+            onClick={() => setActiveTab("file")}
+            style={{
+              background: "transparent", border: "none", color: activeTab === "file" ? "#00d1e0" : "rgba(255,255,255,0.5)",
+              fontSize: "14px", fontWeight: 600, cursor: "pointer", display: "flex", alignItems: "center", gap: "8px",
+              borderBottom: activeTab === "file" ? "2px solid #00d1e0" : "2px solid transparent", paddingBottom: "14px", marginBottom: "-14px"
+            }}
+          >
+            <i className="ti ti-file-upload"></i> UPLOAD FILE
+          </button>
+          <button 
+            onClick={() => setActiveTab("url")}
+            style={{
+              background: "transparent", border: "none", color: activeTab === "url" ? "#00d1e0" : "rgba(255,255,255,0.5)",
+              fontSize: "14px", fontWeight: 600, cursor: "pointer", display: "flex", alignItems: "center", gap: "8px",
+              borderBottom: activeTab === "url" ? "2px solid #00d1e0" : "2px solid transparent", paddingBottom: "14px", marginBottom: "-14px"
+            }}
+          >
+            <i className="ti ti-link"></i> PASTE URL
+          </button>
+        </div>
+
         <input
           type="file"
           ref={fileInputRef}
@@ -193,42 +244,77 @@ const Dashboard = () => {
           onChange={handleFileChange}
         />
 
-        {/* Drop zone */}
-        <div
-          className="upload-zone"
-          onClick={handleBrowseClick}
-          onDragOver={(e) => e.preventDefault()}
-          onDrop={handleDrop}
-          style={{ cursor: "pointer" }}
-        >
-          <div className="upload-icon-wrapper">
-            <i className="ti ti-cloud-upload"></i>
-          </div>
-          <p>
-            Drop audio file here or{" "}
-            <span style={{ color: "var(--accent-orange)" }}>browse files</span>
-          </p>
-          <div className="upload-formats">
-            WAV • MP3 • FLAC • OGG • M4A • OPUS • up to 25 MB
-          </div>
-        </div>
+        {activeTab === "file" ? (
+          <>
+            {/* Drop zone */}
+            <div
+              className={`upload-zone ${dragActive ? "drag-active" : ""}`}
+              onClick={handleBrowseClick}
+              onDragEnter={handleDrag}
+              onDragLeave={handleDrag}
+              onDragOver={handleDrag}
+              onDrop={handleDrop}
+              style={{ cursor: "pointer" }}
+            >
+              <div className="upload-icon-wrapper">
+                <i className="ti ti-cloud-upload"></i>
+              </div>
+              <p>
+                Drop audio file here or{" "}
+                <span style={{ color: "var(--accent-orange)" }}>browse files</span>
+              </p>
+              <div className="upload-formats">
+                WAV • MP3 • FLAC • OGG • M4A • OPUS • up to 25 MB
+              </div>
+            </div>
 
-        {/* File row */}
-        {file && (
-          <div className="file-row">
-            <div className="file-pill">
-              <i className="ti ti-file-music" style={{ fontSize: 18 }}></i>
-              {file.name}
+            {/* File row */}
+            {file && (
+              <div className="file-row">
+                <div className="file-pill">
+                  <i className="ti ti-file-music" style={{ fontSize: 18 }}></i>
+                  {file.name}
+                </div>
+                <button
+                  className="btn-primary"
+                  onClick={handleAnalyze}
+                  disabled={isAnalyzing}
+                >
+                  {isAnalyzing ? (
+                    "ANALYZING..."
+                  ) : (
+                    <>ANALYZE <i className="ti ti-arrow-right"></i></>
+                  )}
+                </button>
+              </div>
+            )}
+          </>
+        ) : (
+          <div className="url-row" style={{ display: "flex", flexDirection: "column", gap: "16px" }}>
+            <div style={{ position: "relative" }}>
+              <i className="ti ti-link" style={{ position: "absolute", left: "16px", top: "50%", transform: "translateY(-50%)", color: "var(--accent-cyan)", fontSize: "20px" }}></i>
+              <input 
+                type="text" 
+                placeholder="Paste YouTube, SoundCloud, or direct audio link..." 
+                value={url}
+                onChange={(e) => setUrl(e.target.value)}
+                style={{
+                  width: "100%", padding: "16px 16px 16px 48px", borderRadius: "12px",
+                  background: "rgba(0, 209, 224, 0.05)", border: "1px solid rgba(0, 209, 224, 0.2)",
+                  color: "white", fontSize: "14px", outline: "none", fontFamily: "inherit"
+                }}
+              />
             </div>
             <button
               className="btn-primary"
               onClick={handleAnalyze}
-              disabled={isAnalyzing}
+              disabled={isAnalyzing || !url.trim()}
+              style={{ width: "100%", justifyContent: "center" }}
             >
               {isAnalyzing ? (
-                "ANALYZING..."
+                "DOWNLOADING & ANALYZING..."
               ) : (
-                <>ANALYZE <i className="ti ti-arrow-right"></i></>
+                <>ANALYZE URL <i className="ti ti-arrow-right"></i></>
               )}
             </button>
           </div>

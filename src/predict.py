@@ -14,7 +14,7 @@ import tempfile
 os.environ['TF_CPP_MIN_LOG_LEVEL'] = '2'
 
 # Use a path relative to this file, not the working directory
-model_path = Path(__file__).parent.parent / 'models' / 'vocal_armor_best.keras'
+model_path = Path(__file__).parent.parent / 'models' / 'vocal_armor_v3.keras'
 
 ALLOWED_EXTENSIONS = {'.wav', '.mp3', '.flac', '.ogg', '.m4a', '.aac'}
 

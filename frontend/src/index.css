@@ -479,30 +479,43 @@ h3,
   background: var(--bg-card);
   border: 1px solid var(--border-color);
   border-radius: 16px;
-  padding: 20px;
-  max-width: 600px;
+  padding: 24px;
+  max-width: 750px;
   margin: 0 auto 40px;
   backdrop-filter: blur(20px);
 }
 .upload-zone {
   border: 1px dashed var(--accent-cyan);
   border-radius: 12px;
-  padding: 40px 20px;
+  padding: 60px 20px;
   text-align: center;
   background: rgba(0, 209, 224, 0.02);
   margin-bottom: 16px;
+  transition: all 0.2s ease-in-out;
+}
+.upload-zone:hover, .upload-zone.drag-active {
+  background: rgba(0, 209, 224, 0.08);
+  border-color: #00e8d8;
+  box-shadow: 0 0 24px rgba(0, 209, 224, 0.2);
+  transform: scale(1.01);
 }
 .upload-icon-wrapper {
-  width: 48px;
-  height: 48px;
+  width: 56px;
+  height: 56px;
   background: rgba(0, 209, 224, 0.1);
   border-radius: 50%;
   display: flex;
   align-items: center;
   justify-content: center;
   color: var(--accent-cyan);
-  font-size: 24px;
+  font-size: 28px;
   margin: 0 auto 16px;
+  transition: all 0.2s;
+}
+.upload-zone:hover .upload-icon-wrapper {
+  background: var(--accent-cyan);
+  color: #000;
+  box-shadow: 0 0 16px var(--accent-cyan);
 }
 .upload-zone p {
   font-size: 14px;

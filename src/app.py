@@ -46,7 +46,7 @@ def health_check():
     return {
         "status":            "healthy",
         "model":             "VocalArmor_CNN",
-        "model_version":     "1.0",
+        "model_version":     "3.0",
         "supported_formats": sorted(ALLOWED_EXTENSIONS),
         "max_file_size_mb":  50,
         "engine_loaded":     engine is not None,
@@ -115,6 +115,63 @@ async def predict_audio(file: UploadFile = File(...)):
     return JSONResponse(content={
         "status":      "success",
         "filename":    file.filename,
+        "prediction":  result["prediction"],
+        "confidence":  result["confidence"],
+        "raw_score":   result["raw_score"],
+        "is_deepfake": is_fake,
+        "message": (
+            f"AI-generated voice detected with {result['confidence']}% confidence."
+            if is_fake else
+            f"Human voice verified with {result['confidence']}% confidence."
+        ),
+    })
+
+@app.post("/predict-url", tags=["Detection"])
+async def predict_from_url(url: str):
+    import yt_dlp
+    import re
+
+    # Basic URL validation
+    if not url.startswith("http"):
+        raise HTTPException(status_code=400, detail="Invalid URL.")
+
+    temp_path = None
+    try:
+        # yt-dlp handles YouTube, SoundCloud, direct links, and 1000+ sites
+        with tempfile.TemporaryDirectory() as tmp_dir:
+            ydl_opts = {
+                'format': 'bestaudio/best',
+                'outtmpl': f'{tmp_dir}/audio.%(ext)s',
+                'postprocessors': [{
+                    'key': 'FFmpegExtractAudio',
+                    'preferredcodec': 'mp3',
+                }],
+                'quiet': True,
+                'no_warnings': True,
+                'max_filesize': 50 * 1024 * 1024,  # 50MB limit
+            }
+
+            with yt_dlp.YoutubeDL(ydl_opts) as ydl:
+                ydl.download([url])
+
+            # Find the downloaded file
+            files = list(Path(tmp_dir).glob('*.mp3'))
+            if not files:
+                raise Exception("Could not download audio from URL.")
+
+            temp_path = str(files[0])
+            result = predict_voice(temp_path, engine)
+
+    except Exception as e:
+        raise HTTPException(
+            status_code=500,
+            detail=f"Failed to process URL: {str(e)}"
+        )
+
+    is_fake = result["prediction"] == "FAKE"
+    return JSONResponse(content={
+        "status":      "success",
+        "source_url":  url,
         "prediction":  result["prediction"],
         "confidence":  result["confidence"],
         "raw_score":   result["raw_score"],
