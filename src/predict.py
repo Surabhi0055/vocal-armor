@@ -1,14 +1,20 @@
 import os
 import numpy as np
 from pathlib import Path
+
+# Disable Metal GPU — Apple Metal uses float16 which causes activation collapse
+# and produces wrong predictions. CPU float32 gives correct results.
+os.environ['CUDA_VISIBLE_DEVICES'] = ''
 import tensorflow as tf
+tf.config.set_visible_devices([], 'GPU')
+
 import librosa
 import tempfile
 
 os.environ['TF_CPP_MIN_LOG_LEVEL'] = '2'
 
 # Use a path relative to this file, not the working directory
-model_path = Path(__file__).parent.parent / 'models' / 'vocal_armor_v3.keras'
+model_path = Path(__file__).parent.parent / 'models' / 'vocal_armor_best.keras'
 
 ALLOWED_EXTENSIONS = {'.wav', '.mp3', '.flac', '.ogg', '.m4a', '.aac'}
 
@@ -39,15 +45,19 @@ def preprocess_audio(audio_path):
     y, sr = librosa.load(audio_path, sr=SR_TARGET, mono=True)
 
     #  2. Find the loudest 2-second window 
-    # Downloaded AI voices often have silence at the start/end.
-    # Picking the loudest window gives the model the most informative segment.
+    # If the file is already ~2 seconds (pre-processed), just pad — don't re-window.
+    # Re-windowing pre-trimmed files shifts the start index and distorts the input.
     expected_samples = int(SR_TARGET * DURATION)
+    PREPROCESS_THRESHOLD = int(SR_TARGET * 2.2)  # 2.2s = already processed
 
     if len(y) <= expected_samples:
         # File is 2 s or shorter — just pad it
         y = np.pad(y, (0, max(0, expected_samples - len(y))))
+    elif len(y) <= PREPROCESS_THRESHOLD:
+        # File is between 2–2.2 s: already trimmed, just truncate cleanly
+        y = y[:expected_samples]
     else:
-        # Slide a 2-second window and pick the one with highest RMS energy
+        # Longer raw audio — slide a 2-second window and pick highest RMS energy
         hop = SR_TARGET // 10          # 0.1-second hops
         best_start = 0
         best_rms   = -1.0
@@ -78,17 +88,9 @@ def preprocess_audio(audio_path):
     img = img.transpose(Image.FLIP_TOP_BOTTOM)
     img = img.resize(IMG_SIZE, resample=Image.LANCZOS)   # direct to 128×128
 
-    #  6. Save to a secure temp file, load back as array 
-    with tempfile.NamedTemporaryFile(suffix='.png', delete=False) as tmp:
-        temp_path = tmp.name
-        img.save(temp_path)
-
-    try:
-        loaded_img = tf.keras.utils.load_img(temp_path, target_size=IMG_SIZE)
-        img_array  = tf.keras.utils.img_to_array(loaded_img) / 255.0
-        final      = np.expand_dims(img_array, axis=0)
-    finally:
-        os.remove(temp_path)   # always clean up even if an error occurs
+    #  6. Directly convert PIL image to array and normalize
+    img_array = np.array(img) / 255.0
+    final = np.expand_dims(img_array, axis=0)
 
     return final
 
@@ -136,7 +138,7 @@ def predict_voice(audio_path: str, model) -> dict:
 if __name__ == "__main__":
     engine = load_vocal_armor()
     test_file = "../data/for-2seconds/testing/fake/file1001.wav_16k.wav_norm.wav_mono.wav_silence.wav_2sec.wav"
-    if Path(test_file).exists():          # fixed: was `exists` without ()
+    if Path(test_file).exists():      
         predict_voice(test_file, engine)
     else:
         print(f"\nCould not find {test_file}. Please update the path!")

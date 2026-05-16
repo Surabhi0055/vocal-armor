@@ -3,32 +3,44 @@ import React from 'react';
 const Sidebar = () => {
   return (
     <div className="sidebar">
-      <div className="side-icon active">
-        <i className="ti ti-home"></i>
-        <span>Home</span>
+      <div className="sidebar-header">
+        <div className="sidebar-logo-icon">
+          <i className="ti ti-waveform"></i>
+        </div>
+        <span className="sidebar-logo-text">VOCAL<span style={{fontWeight: 300}}>ARMOR</span></span>
       </div>
-      <div className="side-icon">
-        <i className="ti ti-chart-bar"></i>
-        <span>Analyze</span>
+
+      <div className="sidebar-top">
+        <a href="#" className="side-icon-box active">
+          <i className="ti ti-home"></i>
+          <span className="side-text">Detector</span>
+          <span className="sidebar-badge badge-orange" style={{marginLeft: 'auto'}}>v3</span>
+        </a>
+        <a href="#" className="side-icon-box">
+          <i className="ti ti-history"></i>
+          <span className="side-text">History</span>
+          <span className="sidebar-badge badge-cyan" style={{marginLeft: 'auto'}}>24</span>
+        </a>
+        <a href="#" className="side-icon-box">
+          <i className="ti ti-layout-list"></i>
+          <span className="side-text">Batch Upload</span>
+        </a>
+        <a href="#" className="side-icon-box">
+          <i className="ti ti-activity"></i>
+          <span className="side-text">Live Monitor</span>
+          <span className="sidebar-badge badge-orange" style={{marginLeft: 'auto'}}>NEW</span>
+        </a>
       </div>
-      <div className="side-icon">
-        <i className="ti ti-history"></i>
-        <span>History</span>
-      </div>
-      <div className="side-icon">
-        <i className="ti ti-code"></i>
-        <span>API</span>
-      </div>
-      
-      <div className="side-bottom">
-        <div className="side-icon">
+
+      <div className="sidebar-bottom">
+        <a href="#" className="side-icon-box">
           <i className="ti ti-settings"></i>
-          <span>Settings</span>
-        </div>
-        <div className="side-icon">
+          <span className="side-text">Settings</span>
+        </a>
+        <a href="#" className="side-icon-box">
           <i className="ti ti-help"></i>
-          <span>Help</span>
-        </div>
+          <span className="side-text">Support</span>
+        </a>
       </div>
     </div>
   );

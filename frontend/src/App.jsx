@@ -1,26 +1,21 @@
 import React from 'react';
 import Sidebar from './components/Sidebar';
 import Navbar from './components/Navbar';
+import Dashboard from './components/Dashboard';
+import WaveformBackground from './components/WaveformBackground';
+import CustomCursor from './components/CustomCursor';
 
 function App() {
   return (
     <>
-      {/* Background Ambient Orbs */}
-      <div className="orb orb-1"></div>
-      <div className="orb orb-2"></div>
-      <div className="orb orb-3"></div>
-      
+      <CustomCursor />
+      <WaveformBackground />
+
       <Sidebar />
 
-      <div className="main-wrapper">
+      <div className="main-content">
         <Navbar />
-        
-        <div className="content">
-          <h1 className="hero-title">Detect AI Voices<br/>Before They Deceive</h1>
-          <p style={{ textAlign: 'center', color: 'var(--text-muted)' }}>
-             Our frontend is successfully connected to React!
-          </p>
-        </div>
+        <Dashboard />
       </div>
     </>
   )

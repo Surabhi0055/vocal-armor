@@ -10,7 +10,7 @@ from predict import load_vocal_armor, predict_voice, ALLOWED_EXTENSIONS
 app = FastAPI(
     title="Vocal-Armor API",
     description=(
-        "🎙️ Real-time deepfake voice detection API. "
+        "Real-time deepfake voice detection API. "
         "Upload any audio file and the engine will classify it as "
         "REAL (human) or FAKE (AI-generated)."
     ),
