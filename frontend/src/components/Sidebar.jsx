@@ -1,4 +1,5 @@
 import React from 'react';
+import { NavLink } from 'react-router-dom';
 
 const Sidebar = () => {
   return (
@@ -11,25 +12,25 @@ const Sidebar = () => {
       </div>
 
       <div className="sidebar-top">
-        <a href="#" className="side-icon-box active">
+        <NavLink to="/" end className={({ isActive }) => `side-icon-box ${isActive ? 'active' : ''}`}>
           <i className="ti ti-home"></i>
           <span className="side-text">Detector</span>
           <span className="sidebar-badge badge-orange" style={{marginLeft: 'auto'}}>v3</span>
-        </a>
-        <a href="#" className="side-icon-box">
+        </NavLink>
+        <NavLink to="/history" className={({ isActive }) => `side-icon-box ${isActive ? 'active' : ''}`}>
           <i className="ti ti-history"></i>
           <span className="side-text">History</span>
           <span className="sidebar-badge badge-cyan" style={{marginLeft: 'auto'}}>24</span>
-        </a>
+        </NavLink>
         <a href="#" className="side-icon-box">
           <i className="ti ti-layout-list"></i>
           <span className="side-text">Batch Upload</span>
         </a>
-        <a href="#" className="side-icon-box">
+        <NavLink to="/live" className={({ isActive }) => `side-icon-box ${isActive ? 'active' : ''}`}>
           <i className="ti ti-activity"></i>
           <span className="side-text">Live Monitor</span>
           <span className="sidebar-badge badge-orange" style={{marginLeft: 'auto'}}>NEW</span>
-        </a>
+        </NavLink>
       </div>
 
       <div className="sidebar-bottom">

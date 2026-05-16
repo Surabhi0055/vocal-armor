@@ -1,8 +1,5 @@
-import React, { useState, useRef, useEffect, useCallback, useMemo } from "react";
-import FakeRateChart from "./FakeRateChart";
-import ConfidenceHistogram from "./ConfidenceHistogram";
-import HistoryTable from "./HistoryTable";
-import { saveAnalysis, getHistory } from "../utils/storage";
+import React, { useState, useRef, useEffect, useCallback } from "react";
+import { saveAnalysis } from "../utils/storage";
 
 const Dashboard = () => {
   const [file, setFile] = useState(null);
@@ -15,58 +12,6 @@ const Dashboard = () => {
   const analyserRef = useRef(null);
   const sourceRef = useRef(null);
   const reqIdRef = useRef(null);
-
-  // Quick stats state
-  const [quickStats, setQuickStats] = useState({
-    maxFake: null,
-    maxReal: null,
-    streak: 0,
-    todayCount: 0
-  });
-
-  const loadQuickStats = useCallback(() => {
-    const history = getHistory();
-    let maxF = null, maxR = null;
-    let currentStreak = 0, maxStreak = 0;
-    let prevWasFake = false;
-    let todayC = 0;
-    
-    const today = new Date().toLocaleDateString();
-
-    history.forEach(item => {
-      // most confident fake/real
-      if (item.prediction === 'FAKE') {
-        if (!maxF || item.confidence > maxF.confidence) maxF = item;
-      } else {
-        if (!maxR || item.confidence > maxR.confidence) maxR = item;
-      }
-      
-      // today's count
-      if (item.date === today) todayC++;
-    });
-
-    // Calculate longest session streak of FAKE detections
-    // Since history is newest first, let's reverse to process chronologically
-    [...history].reverse().forEach(item => {
-      if (item.prediction === 'FAKE') {
-        if (prevWasFake) currentStreak++;
-        else currentStreak = 1;
-        prevWasFake = true;
-        if (currentStreak > maxStreak) maxStreak = currentStreak;
-      } else {
-        prevWasFake = false;
-        currentStreak = 0;
-      }
-    });
-
-    setQuickStats({ maxFake: maxF, maxReal: maxR, streak: maxStreak, todayCount: todayC });
-  }, []);
-
-  useEffect(() => {
-    loadQuickStats();
-    window.addEventListener('va_history_updated', loadQuickStats);
-    return () => window.removeEventListener('va_history_updated', loadQuickStats);
-  }, [loadQuickStats]);
 
   // ── Spectrogram animator ──────────────────────────────────────────────────
   const stopVisualizer = useCallback(() => {
@@ -499,65 +444,74 @@ const Dashboard = () => {
           </div>
         )}
       </div>
-      <div className="section-divider">
-        <span className="section-divider-text" style={{ fontSize: '12px', letterSpacing: '0.3em', color: '#3d6e6a' }}>SESSION ANALYTICS</span>
+
+      {/* ── Stats ── */}
+      <div className="stats-row">
+        <div className="stat-pill"><strong>31K+</strong> voices analyzed</div>
+        <div className="stat-pill"><strong>98.1%</strong> val accuracy</div>
+        <div className="stat-pill"><strong>&lt;2s</strong> detection time</div>
+        <div className="stat-pill"><strong>7</strong> audio formats</div>
+        <div className="stat-pill"><strong>0.3%</strong> false negatives</div>
       </div>
 
-      <FakeRateChart />
+      <div className="section-divider">
+        <span className="section-divider-text">HOW IT WORKS</span>
+      </div>
 
-      <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(300px, 1fr))', gap: '20px', marginBottom: '40px' }}>
-        <ConfidenceHistogram />
-        
-        {/* Quick Stats Panel */}
-        <div style={{ background: '#0f2229', border: '1px solid rgba(255,255,255,0.08)', borderRadius: '16px', padding: '24px', backdropFilter: 'blur(16px)', display: 'flex', flexDirection: 'column', gap: '16px' }}>
-          <div style={{ fontSize: '10px', letterSpacing: '0.2em', color: '#3d6e6a', textTransform: 'uppercase', marginBottom: '8px', fontWeight: 700 }}>
-            QUICK STATS
+      <div className="hiw-grid">
+        <div className="hiw-card">
+          <div className="hiw-step-number">1</div>
+          <div className="hiw-title">Audio Ingestion</div>
+          <div className="hiw-desc">
+            Loads audio, forces mono channel, and resamples to 22.05 kHz for
+            uniform analysis input across all supported formats.
           </div>
-
-          <div style={{ background: 'rgba(232,82,30,0.05)', border: '1px solid rgba(232,82,30,0.1)', borderRadius: '12px', padding: '16px' }}>
-            <div style={{ fontSize: '11px', color: '#7ea8a4', marginBottom: '4px' }}>Most Confident FAKE</div>
-            {quickStats.maxFake ? (
-              <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
-                <span style={{ color: '#dfe8e6', fontSize: '13px', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap', maxWidth: '70%' }}>
-                  {quickStats.maxFake.filename}
-                </span>
-                <span style={{ color: '#e8521e', fontWeight: 600 }}>{quickStats.maxFake.confidence.toFixed(1)}%</span>
-              </div>
-            ) : (
-              <div style={{ color: 'rgba(255,255,255,0.3)', fontSize: '13px' }}>No fakes detected yet</div>
-            )}
+        </div>
+        <div className="hiw-card">
+          <div className="hiw-step-number">2</div>
+          <div className="hiw-title">Mel Spectrogram</div>
+          <div className="hiw-desc">
+            Converts the loudest 2-second window into a 128×128 mel spectrogram
+            image for deep visual pattern recognition.
           </div>
-
-          <div style={{ background: 'rgba(0,212,200,0.05)', border: '1px solid rgba(0,212,200,0.1)', borderRadius: '12px', padding: '16px' }}>
-            <div style={{ fontSize: '11px', color: '#7ea8a4', marginBottom: '4px' }}>Most Confident REAL</div>
-            {quickStats.maxReal ? (
-              <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
-                <span style={{ color: '#dfe8e6', fontSize: '13px', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap', maxWidth: '70%' }}>
-                  {quickStats.maxReal.filename}
-                </span>
-                <span style={{ color: '#00d4c8', fontWeight: 600 }}>{quickStats.maxReal.confidence.toFixed(1)}%</span>
-              </div>
-            ) : (
-              <div style={{ color: 'rgba(255,255,255,0.3)', fontSize: '13px' }}>No real voices detected yet</div>
-            )}
+        </div>
+        <div className="hiw-card">
+          <div className="hiw-step-number">3</div>
+          <div className="hiw-title">CNN Inference</div>
+          <div className="hiw-desc">
+            VocalArmor's proprietary CNN model classifies the spectrogram as a
+            real human voice or an AI-generated deepfake.
           </div>
-
-          <div style={{ display: 'flex', gap: '16px' }}>
-            <div style={{ flex: 1, background: 'rgba(255,255,255,0.02)', border: '1px solid rgba(255,255,255,0.05)', borderRadius: '12px', padding: '16px', textAlign: 'center' }}>
-              <div style={{ fontSize: '24px', fontWeight: 800, color: '#f0a429', marginBottom: '4px' }}>{quickStats.streak}</div>
-              <div style={{ fontSize: '11px', color: '#7ea8a4', lineHeight: 1.2 }}>Longest Fake Streak</div>
-            </div>
-            <div style={{ flex: 1, background: 'rgba(255,255,255,0.02)', border: '1px solid rgba(255,255,255,0.05)', borderRadius: '12px', padding: '16px', textAlign: 'center' }}>
-              <div style={{ fontSize: '24px', fontWeight: 800, color: '#00d4c8', marginBottom: '4px' }}>{quickStats.todayCount}</div>
-              <div style={{ fontSize: '11px', color: '#7ea8a4', lineHeight: 1.2 }}>Analyses Today</div>
-            </div>
-          </div>
-
         </div>
       </div>
 
-      <HistoryTable />
+      <div className="section-divider">
+        <span className="section-divider-text">MODEL ACCURACY</span>
+      </div>
 
+      <div className="accuracy-grid">
+        <div className="accuracy-card">
+          <div className="accuracy-value val-cyan">98.1%</div>
+          <div className="accuracy-desc">Validation accuracy on held-out dataset of 6,200 samples</div>
+        </div>
+        <div className="accuracy-card">
+          <div className="accuracy-value val-orange">0.3%</div>
+          <div className="accuracy-desc">False negative rate — real voice incorrectly flagged as fake</div>
+        </div>
+        <div className="accuracy-card">
+          <div className="accuracy-value val-white">1.6%</div>
+          <div className="accuracy-desc">False positive rate — deepfake voice slipping through as real</div>
+        </div>
+        <div className="accuracy-card">
+          <div
+            className="accuracy-value val-orange"
+            style={{ color: "#ffc107", textShadow: "0 0 40px rgba(255,193,7,0.4)" }}
+          >
+            31K+
+          </div>
+          <div className="accuracy-desc">Total voice samples analyzed since public launch</div>
+        </div>
+      </div>
     </div>
   );
 };

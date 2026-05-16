@@ -1,4 +1,5 @@
 import React from 'react';
+import { Link } from 'react-router-dom';
 
 const Navbar = () => {
   return (
@@ -33,12 +34,12 @@ const Navbar = () => {
         </div>
 
         <div className="nav-icons">
-          <div className="icon-btn" style={{position: 'relative'}}>
+          <div className="icon-btn" style={{position: 'relative', cursor: 'pointer'}}>
             <i className="ti ti-bell"></i>
             <div style={{position: 'absolute', top: 6, right: 6, width: 6, height: 6, background: '#f25c2c', borderRadius: '50%'}}></div>
           </div>
-          <div className="icon-btn"><i className="ti ti-adjustments-horizontal"></i></div>
-          <div className="icon-btn"><i className="ti ti-user-circle"></i></div>
+          <div className="icon-btn" style={{cursor: 'pointer'}}><i className="ti ti-adjustments-horizontal"></i></div>
+          <Link to="/user" className="icon-btn" style={{textDecoration: 'none', cursor: 'pointer'}}><i className="ti ti-user-circle"></i></Link>
         </div>
       </div>
     </div>

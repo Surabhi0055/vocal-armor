@@ -1,0 +1,170 @@
+import React, { useState, useEffect, useCallback } from "react";
+import { getHistory } from "../utils/storage";
+
+// Lazy imports with error boundaries to isolate crashes
+let FakeRateChart, ConfidenceHistogram, HistoryTable;
+try { FakeRateChart = React.lazy(() => import("./FakeRateChart")); } catch(e) {}
+try { ConfidenceHistogram = React.lazy(() => import("./ConfidenceHistogram")); } catch(e) {}
+try { HistoryTable = React.lazy(() => import("./HistoryTable")); } catch(e) {}
+
+class ErrorBoundary extends React.Component {
+  constructor(props) { super(props); this.state = { hasError: false, error: null }; }
+  static getDerivedStateFromError(error) { return { hasError: true, error }; }
+  render() {
+    if (this.state.hasError) {
+      return (
+        <div style={{ padding: 24, background: 'rgba(232,82,30,0.1)', border: '1px solid rgba(232,82,30,0.3)', borderRadius: 12, color: '#e8521e', marginBottom: 24 }}>
+          <strong>Component Error:</strong> {this.state.error?.message}
+        </div>
+      );
+    }
+    return this.props.children;
+  }
+}
+
+const HistoryPage = () => {
+  const [quickStats, setQuickStats] = useState({
+    maxFake: null, maxReal: null, streak: 0, todayCount: 0
+  });
+
+  const loadQuickStats = useCallback(() => {
+    const history = getHistory();
+    let maxF = null, maxR = null;
+    let currentStreak = 0, maxStreak = 0;
+    let prevWasFake = false;
+    let todayC = 0;
+    const today = new Date().toLocaleDateString();
+
+    history.forEach(item => {
+      if (item.prediction === 'FAKE') {
+        if (!maxF || item.confidence > maxF.confidence) maxF = item;
+      } else {
+        if (!maxR || item.confidence > maxR.confidence) maxR = item;
+      }
+      if (item.date === today) todayC++;
+    });
+
+    [...history].reverse().forEach(item => {
+      if (item.prediction === 'FAKE') {
+        if (prevWasFake) currentStreak++;
+        else currentStreak = 1;
+        prevWasFake = true;
+        if (currentStreak > maxStreak) maxStreak = currentStreak;
+      } else {
+        prevWasFake = false;
+        currentStreak = 0;
+      }
+    });
+
+    setQuickStats({ maxFake: maxF, maxReal: maxR, streak: maxStreak, todayCount: todayC });
+  }, []);
+
+  useEffect(() => {
+    loadQuickStats();
+    window.addEventListener('va_history_updated', loadQuickStats);
+    return () => window.removeEventListener('va_history_updated', loadQuickStats);
+  }, [loadQuickStats]);
+
+  return (
+    <div style={{ padding: '40px', maxWidth: '1100px', margin: '0 auto', width: '100%', position: 'relative', zIndex: 2, paddingBottom: '100px' }}>
+
+      {/* Page Header */}
+      <div style={{ marginBottom: '40px' }}>
+        <div style={{ fontSize: '10px', letterSpacing: '0.3em', color: '#3d6e6a', textTransform: 'uppercase', marginBottom: '12px', fontWeight: 700 }}>
+          THREAT INTELLIGENCE
+        </div>
+        <h1 style={{ fontFamily: '"Bebas Neue", sans-serif', fontSize: '48px', fontWeight: 400, letterSpacing: '2px', lineHeight: 1, marginBottom: '12px', textTransform: 'uppercase' }}>
+          SESSION <span style={{ color: '#00d4c8', textShadow: '0 0 40px rgba(0,212,200,0.4)' }}>ANALYTICS</span>
+        </h1>
+        <p style={{ fontSize: '14px', color: '#7ea8a4', lineHeight: 1.6 }}>
+          Comprehensive history and deepfake threat intelligence data from your analysis sessions.
+        </p>
+      </div>
+
+      {/* FakeRateChart */}
+      <ErrorBoundary>
+        <React.Suspense fallback={
+          <div style={{ height: 300, background: 'rgba(255,255,255,0.02)', borderRadius: 16, marginBottom: 40, display: 'flex', alignItems: 'center', justifyContent: 'center', color: '#7ea8a4' }}>
+            Loading chart...
+          </div>
+        }>
+          {FakeRateChart && <FakeRateChart />}
+        </React.Suspense>
+      </ErrorBoundary>
+
+      {/* Histogram + Quick Stats */}
+      <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(300px, 1fr))', gap: '20px', marginBottom: '40px' }}>
+
+        <ErrorBoundary>
+          <React.Suspense fallback={
+            <div style={{ height: 300, background: 'rgba(255,255,255,0.02)', borderRadius: 16, display: 'flex', alignItems: 'center', justifyContent: 'center', color: '#7ea8a4' }}>
+              Loading chart...
+            </div>
+          }>
+            {ConfidenceHistogram && <ConfidenceHistogram />}
+          </React.Suspense>
+        </ErrorBoundary>
+
+        {/* Quick Stats Panel */}
+        <div style={{ background: '#0f2229', border: '1px solid rgba(255,255,255,0.08)', borderRadius: '16px', padding: '24px', backdropFilter: 'blur(16px)', display: 'flex', flexDirection: 'column', gap: '16px' }}>
+          <div style={{ fontSize: '10px', letterSpacing: '0.2em', color: '#3d6e6a', textTransform: 'uppercase', fontWeight: 700 }}>
+            QUICK STATS
+          </div>
+
+          <div style={{ background: 'rgba(232,82,30,0.05)', border: '1px solid rgba(232,82,30,0.1)', borderRadius: '12px', padding: '16px' }}>
+            <div style={{ fontSize: '11px', color: '#7ea8a4', marginBottom: '4px' }}>Most Confident FAKE</div>
+            {quickStats.maxFake ? (
+              <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+                <span style={{ color: '#dfe8e6', fontSize: '13px', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap', maxWidth: '70%' }}>
+                  {quickStats.maxFake.filename}
+                </span>
+                <span style={{ color: '#e8521e', fontWeight: 600 }}>{quickStats.maxFake.confidence.toFixed(1)}%</span>
+              </div>
+            ) : (
+              <div style={{ color: 'rgba(255,255,255,0.3)', fontSize: '13px' }}>No fakes detected yet</div>
+            )}
+          </div>
+
+          <div style={{ background: 'rgba(0,212,200,0.05)', border: '1px solid rgba(0,212,200,0.1)', borderRadius: '12px', padding: '16px' }}>
+            <div style={{ fontSize: '11px', color: '#7ea8a4', marginBottom: '4px' }}>Most Confident REAL</div>
+            {quickStats.maxReal ? (
+              <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+                <span style={{ color: '#dfe8e6', fontSize: '13px', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap', maxWidth: '70%' }}>
+                  {quickStats.maxReal.filename}
+                </span>
+                <span style={{ color: '#00d4c8', fontWeight: 600 }}>{quickStats.maxReal.confidence.toFixed(1)}%</span>
+              </div>
+            ) : (
+              <div style={{ color: 'rgba(255,255,255,0.3)', fontSize: '13px' }}>No real voices detected yet</div>
+            )}
+          </div>
+
+          <div style={{ display: 'flex', gap: '16px' }}>
+            <div style={{ flex: 1, background: 'rgba(255,255,255,0.02)', border: '1px solid rgba(255,255,255,0.05)', borderRadius: '12px', padding: '16px', textAlign: 'center' }}>
+              <div style={{ fontSize: '24px', fontWeight: 800, color: '#f0a429', marginBottom: '4px' }}>{quickStats.streak}</div>
+              <div style={{ fontSize: '11px', color: '#7ea8a4', lineHeight: 1.2 }}>Longest Fake Streak</div>
+            </div>
+            <div style={{ flex: 1, background: 'rgba(255,255,255,0.02)', border: '1px solid rgba(255,255,255,0.05)', borderRadius: '12px', padding: '16px', textAlign: 'center' }}>
+              <div style={{ fontSize: '24px', fontWeight: 800, color: '#00d4c8', marginBottom: '4px' }}>{quickStats.todayCount}</div>
+              <div style={{ fontSize: '11px', color: '#7ea8a4', lineHeight: 1.2 }}>Analyses Today</div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      {/* History Table */}
+      <ErrorBoundary>
+        <React.Suspense fallback={
+          <div style={{ height: 300, background: 'rgba(255,255,255,0.02)', borderRadius: 16, display: 'flex', alignItems: 'center', justifyContent: 'center', color: '#7ea8a4' }}>
+            Loading table...
+          </div>
+        }>
+          {HistoryTable && <HistoryTable />}
+        </React.Suspense>
+      </ErrorBoundary>
+
+    </div>
+  );
+};
+
+export default HistoryPage;
