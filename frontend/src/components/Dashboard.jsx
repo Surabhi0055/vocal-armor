@@ -1,10 +1,12 @@
 import React, { useState, useRef, useEffect, useCallback } from "react";
 import { saveAnalysis } from "../utils/storage";
+import ModelSelector from './ModelSelector';
 
 const Dashboard = () => {
   const [file, setFile] = useState(null);
   const [isAnalyzing, setIsAnalyzing] = useState(false);
   const [result, setResult] = useState(null);
+  const [selectedModel, setSelectedModel] = useState('best');
 
   const fileInputRef = useRef(null);
   const canvasRef = useRef(null);
@@ -149,6 +151,7 @@ const Dashboard = () => {
         startVisualizer(file);
         const formData = new FormData();
         formData.append("file", file);
+        formData.append("model", selectedModel);
         response = await fetch("http://127.0.0.1:8000/predict", {
           method: "POST",
           body: formData,
@@ -156,7 +159,7 @@ const Dashboard = () => {
       } else {
         stopVisualizer();
         drawIdle();
-        response = await fetch(`http://127.0.0.1:8000/predict-url?url=${encodeURIComponent(url)}`, {
+        response = await fetch(`http://127.0.0.1:8000/predict-url?url=${encodeURIComponent(url)}&model=${selectedModel}`, {
           method: "POST",
         });
       }
@@ -220,6 +223,8 @@ const Dashboard = () => {
       {/* ── Upload Container ── */}
       <div className="upload-container">
         
+        <ModelSelector selectedModel={selectedModel} onModelChange={setSelectedModel} />
+
         {/* Tabs */}
         <div style={{ display: "flex", gap: "16px", marginBottom: "20px", borderBottom: "1px solid rgba(255,255,255,0.1)", paddingBottom: "12px" }}>
           <button 

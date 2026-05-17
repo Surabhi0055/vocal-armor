@@ -1,4 +1,4 @@
-from fastapi import FastAPI, File, UploadFile, HTTPException
+from fastapi import FastAPI, File, UploadFile, HTTPException, WebSocket, Form
 from fastapi.responses import JSONResponse
 from fastapi.middleware.cors import CORSMiddleware
 import uvicorn
@@ -26,7 +26,7 @@ app.add_middleware(
     allow_headers=["*"],
 )
 
-engine = load_vocal_armor()
+engines = load_vocal_armor()
 
 #  Endpoints 
 
@@ -66,7 +66,7 @@ def get_supported_formats():
 
 
 @app.post("/predict", tags=["Detection"])
-async def predict_audio(file: UploadFile = File(...)):
+async def predict_audio(file: UploadFile = File(...), model: str = Form("best")):
 
     # 1. Validate file extension
     ext = Path(file.filename).suffix.lower()
@@ -95,7 +95,8 @@ async def predict_audio(file: UploadFile = File(...)):
             tmp.write(contents)
             temp_path = tmp.name
 
-        result = predict_voice(temp_path, engine)
+        engine_to_use = engines.get(model, engines.get("best"))
+        result = predict_voice(temp_path, engine_to_use, model)
 
     except ValueError as ve:
         raise HTTPException(status_code=400, detail=str(ve))
@@ -127,7 +128,7 @@ async def predict_audio(file: UploadFile = File(...)):
     })
 
 @app.post("/predict-url", tags=["Detection"])
-async def predict_from_url(url: str):
+async def predict_from_url(url: str, model: str = "best"):
     import yt_dlp
     import re
 
@@ -160,7 +161,8 @@ async def predict_from_url(url: str):
                 raise Exception("Could not download audio from URL.")
 
             temp_path = str(files[0])
-            result = predict_voice(temp_path, engine)
+            engine_to_use = engines.get(model, engines.get("best"))
+            result = predict_voice(temp_path, engine_to_use, model)
 
     except Exception as e:
         raise HTTPException(
@@ -182,6 +184,68 @@ async def predict_from_url(url: str):
             f"Human voice verified with {result['confidence']}% confidence."
         ),
     })
+
+
+@app.websocket("/ws/live")
+async def live_inference(websocket: WebSocket):
+    await websocket.accept()
+    print("Live monitor client connected")
+    
+    try:
+        while True:
+            # Receive WAV bytes from browser
+            data = await websocket.receive_bytes()
+            
+            print(f"Received audio chunk: {len(data)} bytes")
+            
+            # Reject suspiciously small payloads (silence/empty)
+            if len(data) < 8000:
+                print(f"Skipping — too small ({len(data)} bytes), likely silence")
+                await websocket.send_json({
+                    "error": "Audio chunk too small or silent, skipping"
+                })
+                continue
+            
+            temp_path = None
+            try:
+                # Save as .wav file
+                with tempfile.NamedTemporaryFile(
+                    suffix=".wav", delete=False
+                ) as tmp:
+                    tmp.write(data)
+                    temp_path = tmp.name
+                
+                print(f"Running inference on: {temp_path}")
+                result = predict_voice(temp_path, engines['best'], "best")
+                is_fake = result["prediction"] == "FAKE"
+                
+                response = {
+                    "prediction":  result["prediction"],
+                    "confidence":  result["confidence"],
+                    "raw_score":   result["raw_score"],
+                    "is_deepfake": is_fake,
+                    "message": (
+                        f"AI-generated voice detected with "
+                        f"{result['confidence']}% confidence."
+                        if is_fake else
+                        f"Human voice verified with "
+                        f"{result['confidence']}% confidence."
+                    ),
+                }
+                print(f"Sending result: {response}")
+                await websocket.send_json(response)
+                
+            except Exception as e:
+                print(f"Inference error: {e}")
+                await websocket.send_json({"error": str(e)})
+                
+            finally:
+                if temp_path and os.path.exists(temp_path):
+                    os.remove(temp_path)
+                    
+    except Exception as e:
+        print(f"Live monitor client disconnected: {e}")
+        
 
 if __name__ == "__main__":
     uvicorn.run("app:app", host="0.0.0.0", port=8000, reload=False)

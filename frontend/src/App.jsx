@@ -6,6 +6,7 @@ import Dashboard from './components/Dashboard';
 import HistoryPage from './components/HistoryPage';
 import UserPage from './components/UserPage';
 import LiveMonitorPage from './components/LiveMonitorPage';
+import BatchUploadPage from './components/BatchUploadPage';
 import WaveformBackground from './components/WaveformBackground';
 import CustomCursor from './components/CustomCursor';
 
@@ -22,6 +23,7 @@ function App() {
         <Routes>
           <Route path="/" element={<Dashboard />} />
           <Route path="/history" element={<HistoryPage />} />
+          <Route path="/batch" element={<BatchUploadPage />} />
           <Route path="/live" element={<LiveMonitorPage />} />
           <Route path="/user" element={<UserPage />} />
         </Routes>

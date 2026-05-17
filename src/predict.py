@@ -14,22 +14,28 @@ import tempfile
 os.environ['TF_CPP_MIN_LOG_LEVEL'] = '2'
 
 # Use a path relative to this file, not the working directory
-model_path = Path(__file__).parent.parent / 'models' / 'vocal_armor_v3.keras'
+model_path = Path(__file__).parent.parent / 'models' / 'vocal_armor_best.keras'
 
 ALLOWED_EXTENSIONS = {'.wav', '.mp3', '.flac', '.ogg', '.m4a', '.aac'}
 
 def load_vocal_armor():
-    print(f"Loading Vocal-Armor Engine from {model_path}...")
-    if not model_path.exists():
-        raise FileNotFoundError(f"Could not find model at {model_path}!")
+    models_dir = Path(__file__).parent.parent / 'models'
+    loaded_models = {}
+    
+    for name, filename in [('best', 'vocal_armor_best.keras'), ('v2', 'vocal_armor_v2.keras'), ('v3', 'vocal_armor_v3.keras')]:
+        path = models_dir / filename
+        if path.exists():
+            print(f"Loading {name} model from {path}...")
+            loaded_models[name] = tf.keras.models.load_model(path)
+            
+    if not loaded_models:
+        raise FileNotFoundError("Could not find any models in the models directory!")
+        
+    print(f"Successfully loaded models: {list(loaded_models.keys())}")
+    return loaded_models
 
-    model = tf.keras.models.load_model(model_path)
-    print("Model loaded successfully!")
-    model.summary()
-    return model
 
-
-def preprocess_audio(audio_path):
+def preprocess_audio(audio_path, model_name="best"):
 
     import matplotlib.cm as cm
     from PIL import Image
@@ -48,16 +54,11 @@ def preprocess_audio(audio_path):
     # If the file is already ~2 seconds (pre-processed), just pad — don't re-window.
     # Re-windowing pre-trimmed files shifts the start index and distorts the input.
     expected_samples = int(SR_TARGET * DURATION)
-    PREPROCESS_THRESHOLD = int(SR_TARGET * 2.2)  # 2.2s = already processed
-
     if len(y) <= expected_samples:
         # File is 2 s or shorter — just pad it
         y = np.pad(y, (0, max(0, expected_samples - len(y))))
-    elif len(y) <= PREPROCESS_THRESHOLD:
-        # File is between 2–2.2 s: already trimmed, just truncate cleanly
-        y = y[:expected_samples]
     else:
-        # Longer raw audio — slide a 2-second window and pick highest RMS energy
+        # Slide a 2-second window and pick the one with highest RMS energy
         hop = SR_TARGET // 10          # 0.1-second hops
         best_start = 0
         best_rms   = -1.0
@@ -86,11 +87,29 @@ def preprocess_audio(audio_path):
 
     img = Image.fromarray(uint8_img)
     img = img.transpose(Image.FLIP_TOP_BOTTOM)
-    img = img.resize(IMG_SIZE, resample=Image.LANCZOS)   # direct to 128×128
-
-    #  6. Directly convert PIL image to array and normalize
-    img_array = np.array(img) / 255.0
-    final = np.expand_dims(img_array, axis=0)
+    img = img.resize(IMG_SIZE, resample=Image.LANCZOS)
+    
+    # CRITICAL FIX: Dataset Mismatch!
+    # The original dataset (used for 'best' and 'v2') was created by saving plots as PNGs.
+    # The ElevenLabs dataset (used for 'v3') was created directly using pure numpy arrays.
+    # We must apply the exact preprocessing that the specific model was trained on!
+    
+    if model_name == "v3":
+        # Directly convert PIL image to array and normalize (EXACTLY like notebook for v3)
+        img_array = np.array(img) / 255.0
+        final = np.expand_dims(img_array, axis=0)
+    else:
+        # Apply PNG compression artifacts (required for 'best' and 'v2')
+        import tempfile
+        with tempfile.NamedTemporaryFile(suffix='.png', delete=False) as tmp:
+            temp_path = tmp.name
+            img.save(temp_path)
+        try:
+            loaded_img = tf.keras.utils.load_img(temp_path, target_size=IMG_SIZE)
+            img_array  = tf.keras.utils.img_to_array(loaded_img) / 255.0
+            final      = np.expand_dims(img_array, axis=0)
+        finally:
+            os.remove(temp_path)
 
     return final
 
@@ -105,26 +124,30 @@ def validate_audio_file(audio_path: str):
         )
 
 
-def predict_voice(audio_path: str, model) -> dict:
+def predict_voice(audio_path: str, model, model_name: str = "best") -> dict:
 
     print(f"\nAnalyzing voice sample: {Path(audio_path).name}")
 
     validate_audio_file(audio_path)
 
-    img_array  = preprocess_audio(audio_path)
+    img_array  = preprocess_audio(audio_path, model_name)
 
     print("Running neural network...")
     prediction = model.predict(img_array, verbose=0)
     score      = float(prediction[0, 0])
 
-    print(f"Raw model score: {score:.4f}  (>0.5 = REAL, ≤0.5 = FAKE)")
+    THRESHOLD = 0.50
+    if model_name == "v3":
+        THRESHOLD = 0.60  # Slight bump for v3
 
-    if score > 0.5:
-        confidence = score * 100
+    print(f"Raw model score: {score:.4f}  (>{THRESHOLD} = REAL, ≤{THRESHOLD} = FAKE)")
+
+    if score > THRESHOLD:
+        confidence = 50 + ((score - THRESHOLD) / (1.0 - THRESHOLD)) * 50 if THRESHOLD != 0.5 else score * 100
         label      = "REAL"
         print(f"RESULT: REAL HUMAN VOICE (Confidence: {confidence:.2f}%)")
     else:
-        confidence = (1.0 - score) * 100
+        confidence = 50 + ((THRESHOLD - score) / THRESHOLD) * 50 if THRESHOLD != 0.5 else (1.0 - score) * 100
         label      = "FAKE"
         print(f"RESULT: AI DEEPFAKE DETECTED (Confidence: {confidence:.2f}%)")
 
@@ -136,9 +159,9 @@ def predict_voice(audio_path: str, model) -> dict:
 
 
 if __name__ == "__main__":
-    engine = load_vocal_armor()
+    engines = load_vocal_armor()
     test_file = "../data/for-2seconds/testing/fake/file1001.wav_16k.wav_norm.wav_mono.wav_silence.wav_2sec.wav"
     if Path(test_file).exists():      
-        predict_voice(test_file, engine)
+        predict_voice(test_file, engines['best'], "best")
     else:
         print(f"\nCould not find {test_file}. Please update the path!")
