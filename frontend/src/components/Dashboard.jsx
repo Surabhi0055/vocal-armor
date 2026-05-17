@@ -199,10 +199,7 @@ const Dashboard = () => {
     <div className="dashboard">
       {/* ── Hero ── */}
       <div className="hero-section">
-        <div style={{ display: 'flex', alignItems: 'center', gap: '8px', background: 'rgba(0,212,200,0.07)', border: '1px solid rgba(0,212,200,0.22)', borderRadius: '100px', padding: '8px 20px', fontSize: '10px', letterSpacing: '0.14em', color: '#00d4c8', fontWeight: 600, textTransform: 'uppercase', marginBottom: '40px' }}>
-          <div style={{ width: '6px', height: '6px', borderRadius: '50%', background: '#00d4c8', boxShadow: '0 0 8px #00d4c8', animation: 'livePulse 2s infinite' }}></div>
-          THREAT INTELLIGENCE DASHBOARD
-        </div>
+
         <h1 className="hero-title">
           DETECT AI <span className="text-orange">VOICES</span>
           <br />

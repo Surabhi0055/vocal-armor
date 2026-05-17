@@ -45,10 +45,15 @@ const Navbar = () => {
   };
 
   return (
-    <div className="navbar" style={{ display: 'flex', justifyContent: 'space-between', padding: '16px 32px' }}>
+    <div className="navbar" style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', padding: '16px 32px' }}>
       
-      {/* Left side text navigation */}
-      <div style={{ display: 'flex', alignItems: 'center', gap: '32px', marginLeft: '16px' }}>
+      {/* Left side heading */}
+      <div style={{ flex: 1, display: 'flex', justifyContent: 'flex-start' }}>
+        <span style={{ color: 'white', fontWeight: 700, fontSize: '18px', letterSpacing: '1px' }}>VocalArmor</span>
+      </div>
+      
+      {/* Center side text navigation */}
+      <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '32px', flex: 1 }}>
         <Link to="/" style={{ color: '#7ea8a4', textDecoration: 'none', fontSize: '15px', fontWeight: 500, transition: 'color 0.2s' }} onMouseOver={(e) => e.target.style.color = 'white'} onMouseOut={(e) => e.target.style.color = '#7ea8a4'}>Detector</Link>
         <Link to="/history" style={{ color: '#7ea8a4', textDecoration: 'none', fontSize: '15px', fontWeight: 500, transition: 'color 0.2s' }} onMouseOver={(e) => e.target.style.color = 'white'} onMouseOut={(e) => e.target.style.color = '#7ea8a4'}>History</Link>
         <Link to="/batch" style={{ color: '#7ea8a4', textDecoration: 'none', fontSize: '15px', fontWeight: 500, transition: 'color 0.2s' }} onMouseOver={(e) => e.target.style.color = 'white'} onMouseOut={(e) => e.target.style.color = '#7ea8a4'}>Batch Upload</Link>
@@ -56,7 +61,7 @@ const Navbar = () => {
       </div>
 
       {/* Right side navigation grouping */}
-      <div style={{ display: 'flex', alignItems: 'center', gap: '16px' }}>
+      <div style={{ display: 'flex', alignItems: 'center', gap: '16px', flex: 1, justifyContent: 'flex-end' }}>
         
         {/* Dynamic Search Bar */}
         <div 

@@ -70,9 +70,7 @@ const HistoryPage = () => {
 
       {/* Page Header */}
       <div style={{ marginBottom: '40px' }}>
-        <div style={{ fontSize: '10px', letterSpacing: '0.3em', color: '#3d6e6a', textTransform: 'uppercase', marginBottom: '12px', fontWeight: 700 }}>
-          THREAT INTELLIGENCE
-        </div>
+
         <h1 style={{ fontFamily: '"Bebas Neue", sans-serif', fontSize: '48px', fontWeight: 400, letterSpacing: '2px', lineHeight: 1, marginBottom: '12px', textTransform: 'uppercase' }}>
           SESSION <span style={{ color: '#00d4c8', textShadow: '0 0 40px rgba(0,212,200,0.4)' }}>ANALYTICS</span>
         </h1>

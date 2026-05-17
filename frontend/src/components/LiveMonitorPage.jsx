@@ -299,10 +299,7 @@ const LiveMonitorPage = () => {
 
       {/* Page Header */}
       <div style={{ marginBottom: '40px' }}>
-        <div style={{ display: 'inline-flex', alignItems: 'center', gap: '8px', background: 'rgba(232,82,30,0.07)', border: '1px solid rgba(232,82,30,0.22)', borderRadius: '100px', padding: '8px 20px', fontSize: '10px', letterSpacing: '0.14em', color: '#e8521e', fontWeight: 600, textTransform: 'uppercase', marginBottom: '20px' }}>
-          <div style={{ width: '6px', height: '6px', borderRadius: '50%', background: '#e8521e', boxShadow: isRecording ? '0 0 8px #e8521e' : 'none', animation: isRecording ? 'livePulse 2s infinite' : 'none' }}></div>
-          {isRecording ? 'LIVE — RECORDING SESSION' : 'LIVE MONITOR (BETA)'}
-        </div>
+
         <h1 style={{ fontFamily: '"Bebas Neue", sans-serif', fontSize: '48px', fontWeight: 400, letterSpacing: '2px', lineHeight: 1, marginBottom: '12px', textTransform: 'uppercase' }}>
           REAL-TIME <span style={{ color: '#e8521e', textShadow: '0 0 40px rgba(232,82,30,0.4)' }}>STREAM ANALYSIS</span>
         </h1>

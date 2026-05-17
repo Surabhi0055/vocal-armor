@@ -19,12 +19,10 @@ const Sidebar = () => {
         <NavLink to="/" end className={({ isActive }) => `side-icon-box ${isActive ? 'active' : ''}`}>
           <i className="ti ti-home"></i>
           <span className="side-text">Detector</span>
-          <span className="sidebar-badge badge-orange" style={{marginLeft: 'auto'}}>v3</span>
         </NavLink>
         <NavLink to="/history" className={({ isActive }) => `side-icon-box ${isActive ? 'active' : ''}`}>
           <i className="ti ti-history"></i>
           <span className="side-text">History</span>
-          <span className="sidebar-badge badge-cyan" style={{marginLeft: 'auto'}}>24</span>
         </NavLink>
         <NavLink to="/batch" className={({ isActive }) => `side-icon-box ${isActive ? 'active' : ''}`}>
           <i className="ti ti-layout-list"></i>
@@ -33,7 +31,6 @@ const Sidebar = () => {
         <NavLink to="/live" className={({ isActive }) => `side-icon-box ${isActive ? 'active' : ''}`}>
           <i className="ti ti-activity"></i>
           <span className="side-text">Live Monitor</span>
-          <span className="sidebar-badge badge-orange" style={{marginLeft: 'auto'}}>NEW</span>
         </NavLink>
       </div>
 
