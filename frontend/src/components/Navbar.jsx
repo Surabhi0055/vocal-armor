@@ -1,129 +1,192 @@
 import React, { useState, useRef, useEffect } from 'react';
-import { Link, useNavigate } from 'react-router-dom';
+import { Link } from 'react-router-dom';
+import { useUser } from '../UserContext';
 
 const Navbar = () => {
+  const [isSearchActive, setIsSearchActive] = useState(false);
+  const [searchValue, setSearchValue] = useState('');
   const [showNotifications, setShowNotifications] = useState(false);
-  const [showSettings, setShowSettings] = useState(false);
-  const [searchQuery, setSearchQuery] = useState('');
-  const notifRef = useRef(null);
-  const settingsRef = useRef(null);
-  const navigate = useNavigate();
+  const [showProfileMenu, setShowProfileMenu] = useState(false);
+  
+  const searchInputRef = useRef(null);
+  
+  const { profile } = useUser();
+  const initials = (profile.firstName[0] + profile.lastName[0]).toUpperCase();
 
-  // Close dropdowns when clicking outside
+  // Handle clicking outside of dropdowns to close them
   useEffect(() => {
     const handleClickOutside = (event) => {
-      if (notifRef.current && !notifRef.current.contains(event.target)) {
+      if (!event.target.closest('.nav-icon-btn') && !event.target.closest('.dropdown-menu')) {
         setShowNotifications(false);
-      }
-      if (settingsRef.current && !settingsRef.current.contains(event.target)) {
-        setShowSettings(false);
+        setShowProfileMenu(false);
       }
     };
     document.addEventListener('mousedown', handleClickOutside);
     return () => document.removeEventListener('mousedown', handleClickOutside);
   }, []);
 
-  const handleSearch = (e) => {
-    setSearchQuery(e.target.value);
+  const handleSearchClick = () => {
+    setIsSearchActive(true);
+    setTimeout(() => searchInputRef.current?.focus(), 100);
+  };
+
+  const handleSearchBlur = () => {
+    if (!searchValue) {
+      setIsSearchActive(false);
+    }
   };
 
   const executeSearch = (e) => {
-    if (e.key === 'Enter' && searchQuery.trim() !== '') {
-      // In a real app, this would route to a search results page
-      console.log('Searching for:', searchQuery);
-      alert(`Searching for: ${searchQuery}`);
-      setSearchQuery('');
+    if (e.key === 'Enter') {
+      console.log('Searching for:', searchValue);
+      alert(`Search feature triggered for: ${searchValue}`);
+      // In the future, this will link to filtering logic on the History or Batch page
     }
   };
 
   return (
-    <div className="navbar">
-      <div className="nav-left">
-        <div className="nav-breadcrumbs">
-          <span style={{color: 'var(--text-main)', fontWeight: 700, fontSize: '18px', letterSpacing: '1px'}}>VocalArmor</span>
-        </div>
+    <div className="navbar" style={{ display: 'flex', justifyContent: 'space-between', padding: '16px 32px' }}>
+      
+      {/* Left side text navigation */}
+      <div style={{ display: 'flex', alignItems: 'center', gap: '32px', marginLeft: '16px' }}>
+        <Link to="/" style={{ color: '#7ea8a4', textDecoration: 'none', fontSize: '15px', fontWeight: 500, transition: 'color 0.2s' }} onMouseOver={(e) => e.target.style.color = 'white'} onMouseOut={(e) => e.target.style.color = '#7ea8a4'}>Detector</Link>
+        <Link to="/history" style={{ color: '#7ea8a4', textDecoration: 'none', fontSize: '15px', fontWeight: 500, transition: 'color 0.2s' }} onMouseOver={(e) => e.target.style.color = 'white'} onMouseOut={(e) => e.target.style.color = '#7ea8a4'}>History</Link>
+        <Link to="/batch" style={{ color: '#7ea8a4', textDecoration: 'none', fontSize: '15px', fontWeight: 500, transition: 'color 0.2s' }} onMouseOver={(e) => e.target.style.color = 'white'} onMouseOut={(e) => e.target.style.color = '#7ea8a4'}>Batch Upload</Link>
+        <Link to="/live" style={{ color: '#7ea8a4', textDecoration: 'none', fontSize: '15px', fontWeight: 500, transition: 'color 0.2s' }} onMouseOver={(e) => e.target.style.color = 'white'} onMouseOut={(e) => e.target.style.color = '#7ea8a4'}>Live Monitor</Link>
       </div>
 
-      <div className="nav-right" style={{ display: 'flex', alignItems: 'center', gap: '24px' }}>
+      {/* Right side navigation grouping */}
+      <div style={{ display: 'flex', alignItems: 'center', gap: '16px' }}>
         
-        {/* Interactive Search Bar */}
-        <div className="search-box" style={{ padding: '0 16px', display: 'flex', alignItems: 'center', background: 'rgba(255, 255, 255, 0.05)', border: '1px solid rgba(255, 255, 255, 0.1)' }}>
-          <i className="ti ti-search" style={{fontSize: 16, color: 'var(--text-muted)'}}></i>
+        {/* Dynamic Search Bar */}
+        <div 
+          className="search-box" 
+          style={{
+            display: 'flex',
+            alignItems: 'center',
+            background: isSearchActive ? 'rgba(0, 212, 200, 0.1)' : 'rgba(255, 255, 255, 0.03)',
+            border: isSearchActive ? '1px solid rgba(0, 212, 200, 0.4)' : '1px solid rgba(255, 255, 255, 0.1)',
+            borderRadius: '24px',
+            padding: isSearchActive ? '8px 16px' : '8px',
+            transition: 'all 0.3s cubic-bezier(0.4, 0, 0.2, 1)',
+            width: isSearchActive ? '250px' : '40px',
+            height: '40px',
+            cursor: isSearchActive ? 'text' : 'pointer',
+            overflow: 'hidden'
+          }}
+          onClick={!isSearchActive ? handleSearchClick : undefined}
+        >
+          <i className="ti ti-search" style={{ color: isSearchActive ? '#00d4c8' : '#7ea8a4', fontSize: '18px', minWidth: '18px' }}></i>
           <input 
+            ref={searchInputRef}
             type="text" 
-            placeholder="Search voices, results..." 
-            value={searchQuery}
-            onChange={handleSearch}
+            placeholder="Search scans, dates, or IDs..."
+            value={searchValue}
+            onChange={(e) => setSearchValue(e.target.value)}
+            onBlur={handleSearchBlur}
             onKeyDown={executeSearch}
             style={{
               background: 'transparent',
               border: 'none',
-              color: 'var(--text-main)',
-              padding: '8px 12px',
-              width: '200px',
+              color: 'white',
               outline: 'none',
-              fontSize: '13px'
+              marginLeft: '12px',
+              width: '100%',
+              opacity: isSearchActive ? 1 : 0,
+              pointerEvents: isSearchActive ? 'auto' : 'none',
+              transition: 'opacity 0.2s',
+              fontSize: '14px'
             }}
           />
-          <div className="search-box-shortcut" style={{ marginLeft: 'auto' }}>⌘K</div>
         </div>
 
-        <div className="nav-icons" style={{ display: 'flex', gap: '12px' }}>
+        {/* Separator */}
+        <div style={{ width: '1px', height: '24px', background: 'rgba(255,255,255,0.1)' }}></div>
+
+        {/* Notifications Dropdown */}
+        <div style={{ position: 'relative' }}>
+          <button 
+            className="nav-icon-btn" 
+            style={{ 
+              background: showNotifications ? 'rgba(255,255,255,0.1)' : 'transparent',
+              border: 'none',
+              borderRadius: '50%',
+              width: '40px',
+              height: '40px',
+              display: 'flex',
+              alignItems: 'center',
+              justifyContent: 'center',
+              cursor: 'pointer',
+              color: '#7ea8a4',
+              transition: 'all 0.2s',
+              position: 'relative'
+            }}
+            onClick={() => {
+              setShowNotifications(!showNotifications);
+              setShowProfileMenu(false);
+            }}
+          >
+            <i className="ti ti-bell" style={{ fontSize: '20px' }}></i>
+            <div style={{ position: 'absolute', top: '8px', right: '10px', width: '8px', height: '8px', background: '#00d4c8', borderRadius: '50%', boxShadow: '0 0 10px rgba(0,212,200,0.8)' }}></div>
+          </button>
           
-          {/* Notifications Dropdown */}
-          <div ref={notifRef} style={{ position: 'relative' }}>
-            <div className="icon-btn" style={{position: 'relative', cursor: 'pointer', background: showNotifications ? 'rgba(255,255,255,0.1)' : ''}} onClick={() => { setShowNotifications(!showNotifications); setShowSettings(false); }}>
-              <i className="ti ti-bell"></i>
-              <div style={{position: 'absolute', top: 6, right: 6, width: 6, height: 6, background: '#f25c2c', borderRadius: '50%'}}></div>
-            </div>
-            
-            {showNotifications && (
-              <div style={{ position: 'absolute', top: '120%', right: 0, width: '300px', background: '#0f2229', border: '1px solid rgba(255,255,255,0.1)', borderRadius: '12px', padding: '16px', boxShadow: '0 10px 40px rgba(0,0,0,0.5)', zIndex: 100 }}>
-                <h4 style={{ margin: '0 0 12px 0', fontSize: '14px', color: 'white', borderBottom: '1px solid rgba(255,255,255,0.1)', paddingBottom: '8px' }}>Notifications</h4>
-                <div style={{ display: 'flex', flexDirection: 'column', gap: '12px' }}>
-                  <div style={{ display: 'flex', gap: '12px', alignItems: 'flex-start' }}>
-                    <div style={{ width: '8px', height: '8px', background: '#e8521e', borderRadius: '50%', marginTop: '6px' }}></div>
-                    <div>
-                      <div style={{ fontSize: '13px', color: 'white', fontWeight: 600 }}>High Risk Audio Detected</div>
-                      <div style={{ fontSize: '11px', color: 'var(--text-muted)' }}>2 mins ago • Batch Scan</div>
-                    </div>
-                  </div>
-                  <div style={{ display: 'flex', gap: '12px', alignItems: 'flex-start' }}>
-                    <div style={{ width: '8px', height: '8px', background: '#00d4c8', borderRadius: '50%', marginTop: '6px' }}></div>
-                    <div>
-                      <div style={{ fontSize: '13px', color: 'white', fontWeight: 600 }}>System Update v3.1</div>
-                      <div style={{ fontSize: '11px', color: 'var(--text-muted)' }}>New false-positive filters applied.</div>
-                    </div>
-                  </div>
+          {showNotifications && (
+            <div className="dropdown-menu" style={{ position: 'absolute', top: '50px', right: '0', width: '300px', background: '#0a191e', border: '1px solid rgba(255,255,255,0.1)', borderRadius: '12px', boxShadow: '0 10px 30px rgba(0,0,0,0.5)', zIndex: 100, overflow: 'hidden' }}>
+              <div style={{ padding: '16px', borderBottom: '1px solid rgba(255,255,255,0.05)', fontSize: '14px', fontWeight: 600, color: 'white' }}>Notifications</div>
+              <div style={{ padding: '16px', borderBottom: '1px solid rgba(255,255,255,0.05)', display: 'flex', gap: '12px' }}>
+                <div style={{ width: '8px', height: '8px', borderRadius: '50%', background: '#00d4c8', marginTop: '6px' }}></div>
+                <div>
+                  <div style={{ fontSize: '13px', color: 'white', marginBottom: '4px' }}>Batch Scan Complete</div>
+                  <div style={{ fontSize: '11px', color: '#7ea8a4' }}>10 files analyzed. 1 flagged as high-risk.</div>
+                  <div style={{ fontSize: '10px', color: 'rgba(255,255,255,0.3)', marginTop: '8px' }}>2 minutes ago</div>
                 </div>
               </div>
-            )}
-          </div>
-
-          {/* Settings Dropdown */}
-          <div ref={settingsRef} style={{ position: 'relative' }}>
-            <div className="icon-btn" style={{cursor: 'pointer', background: showSettings ? 'rgba(255,255,255,0.1)' : ''}} onClick={() => { setShowSettings(!showSettings); setShowNotifications(false); }}>
-              <i className="ti ti-adjustments-horizontal"></i>
+              <div style={{ padding: '12px', textAlign: 'center', fontSize: '12px', color: '#00d4c8', cursor: 'pointer', background: 'rgba(0,212,200,0.05)' }}>Mark all as read</div>
             </div>
-            
-            {showSettings && (
-              <div style={{ position: 'absolute', top: '120%', right: 0, width: '200px', background: '#0f2229', border: '1px solid rgba(255,255,255,0.1)', borderRadius: '12px', padding: '8px', boxShadow: '0 10px 40px rgba(0,0,0,0.5)', zIndex: 100, display: 'flex', flexDirection: 'column', gap: '4px' }}>
-                <div style={{ padding: '8px 12px', fontSize: '13px', color: 'var(--text-main)', cursor: 'pointer', borderRadius: '6px', transition: 'background 0.2s' }} onClick={() => navigate('/user')} onMouseOver={(e) => e.target.style.background = 'rgba(255,255,255,0.05)'} onMouseOut={(e) => e.target.style.background = 'transparent'}>
-                  <i className="ti ti-user" style={{ marginRight: '8px' }}></i> User Profile
-                </div>
-                <div style={{ padding: '8px 12px', fontSize: '13px', color: 'var(--text-main)', cursor: 'pointer', borderRadius: '6px', transition: 'background 0.2s' }} onClick={() => navigate('/user')} onMouseOver={(e) => e.target.style.background = 'rgba(255,255,255,0.05)'} onMouseOut={(e) => e.target.style.background = 'transparent'}>
-                  <i className="ti ti-key" style={{ marginRight: '8px' }}></i> API Keys
-                </div>
-                <div style={{ height: '1px', background: 'rgba(255,255,255,0.1)', margin: '4px 0' }}></div>
-                <div style={{ padding: '8px 12px', fontSize: '13px', color: '#e8521e', cursor: 'pointer', borderRadius: '6px', transition: 'background 0.2s' }} onMouseOver={(e) => e.target.style.background = 'rgba(232,82,30,0.1)'} onMouseOut={(e) => e.target.style.background = 'transparent'}>
-                  <i className="ti ti-logout" style={{ marginRight: '8px' }}></i> Sign Out
-                </div>
-              </div>
-            )}
-          </div>
+          )}
+        </div>
 
-          {/* Profile Icon */}
-          <Link to="/user" className="icon-btn" style={{textDecoration: 'none', cursor: 'pointer'}}><i className="ti ti-user-circle"></i></Link>
+        {/* Profile Settings Dropdown */}
+        <div style={{ position: 'relative' }}>
+          <button 
+            className="nav-icon-btn" 
+            style={{ 
+              background: 'transparent',
+              border: '1px solid rgba(255,255,255,0.1)',
+              borderRadius: '20px',
+              padding: '4px 12px 4px 4px',
+              display: 'flex',
+              alignItems: 'center',
+              gap: '8px',
+              cursor: 'pointer',
+              color: 'white',
+              transition: 'all 0.2s',
+            }}
+            onClick={() => {
+              setShowProfileMenu(!showProfileMenu);
+              setShowNotifications(false);
+            }}
+          >
+            <div style={{ width: '30px', height: '30px', borderRadius: '50%', background: 'linear-gradient(135deg, #00d4c8, #0088ff)', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: '12px', fontWeight: 800, fontFamily: '"Bebas Neue", sans-serif' }}>
+              {initials}
+            </div>
+            <i className="ti ti-chevron-down" style={{ fontSize: '14px', color: '#7ea8a4' }}></i>
+          </button>
+
+          {showProfileMenu && (
+            <div className="dropdown-menu" style={{ position: 'absolute', top: '50px', right: '0', width: '200px', background: '#0a191e', border: '1px solid rgba(255,255,255,0.1)', borderRadius: '12px', boxShadow: '0 10px 30px rgba(0,0,0,0.5)', zIndex: 100, overflow: 'hidden', display: 'flex', flexDirection: 'column' }}>
+              <Link to="/user" style={{ padding: '12px 16px', color: 'white', textDecoration: 'none', fontSize: '13px', display: 'flex', alignItems: 'center', gap: '8px', transition: 'background 0.2s' }} onMouseOver={(e) => e.target.style.background = 'rgba(255,255,255,0.05)'} onMouseOut={(e) => e.target.style.background = 'transparent'}>
+                <i className="ti ti-user" style={{ fontSize: '16px', color: '#7ea8a4' }}></i> My Profile
+              </Link>
+              <Link to="/user" style={{ padding: '12px 16px', color: 'white', textDecoration: 'none', fontSize: '13px', display: 'flex', alignItems: 'center', gap: '8px', transition: 'background 0.2s' }} onMouseOver={(e) => e.target.style.background = 'rgba(255,255,255,0.05)'} onMouseOut={(e) => e.target.style.background = 'transparent'}>
+                <i className="ti ti-settings" style={{ fontSize: '16px', color: '#7ea8a4' }}></i> Preferences
+              </Link>
+              <div style={{ width: '100%', height: '1px', background: 'rgba(255,255,255,0.1)' }}></div>
+              <div style={{ padding: '12px 16px', color: '#e8521e', cursor: 'pointer', fontSize: '13px', display: 'flex', alignItems: 'center', gap: '8px', transition: 'background 0.2s' }} onMouseOver={(e) => e.target.style.background = 'rgba(232,82,30,0.1)'} onMouseOut={(e) => e.target.style.background = 'transparent'}>
+                <i className="ti ti-logout" style={{ fontSize: '16px' }}></i> Log Out
+              </div>
+            </div>
+          )}
         </div>
 
       </div>

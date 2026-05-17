@@ -1,5 +1,6 @@
 import React from 'react';
 import { BrowserRouter, Routes, Route } from 'react-router-dom';
+import { UserProvider } from './UserContext';
 import Sidebar from './components/Sidebar';
 import Navbar from './components/Navbar';
 import Dashboard from './components/Dashboard';
@@ -12,8 +13,9 @@ import CustomCursor from './components/CustomCursor';
 
 function App() {
   return (
-    <BrowserRouter>
-      <CustomCursor />
+    <UserProvider>
+      <BrowserRouter>
+        <CustomCursor />
       <WaveformBackground />
 
       <Sidebar />
@@ -29,6 +31,7 @@ function App() {
         </Routes>
       </div>
     </BrowserRouter>
+    </UserProvider>
   )
 }
 

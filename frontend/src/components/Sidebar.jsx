@@ -1,7 +1,11 @@
 import React from 'react';
 import { NavLink } from 'react-router-dom';
+import { useUser } from '../UserContext';
 
 const Sidebar = () => {
+  const { profile } = useUser();
+  const initials = (profile.firstName[0] + profile.lastName[0]).toUpperCase();
+
   return (
     <div className="sidebar">
       <div className="sidebar-header">
@@ -48,11 +52,11 @@ const Sidebar = () => {
           
           <div style={{ display: 'flex', alignItems: 'center', gap: '12px', background: 'rgba(255,255,255,0.02)', border: '1px solid rgba(255,255,255,0.05)', padding: '6px', borderRadius: '30px', width: '90%', transition: 'all 0.3s', cursor: 'pointer' }}>
             <div style={{ minWidth: '36px', height: '36px', borderRadius: '50%', background: 'linear-gradient(135deg, #00d4c8, #0088ff)', display: 'flex', alignItems: 'center', justifyContent: 'center', fontWeight: 800, fontSize: '14px', color: 'white', fontFamily: '"Bebas Neue", sans-serif', letterSpacing: '1px', boxShadow: '0 4px 10px rgba(0,0,0,0.3)' }}>
-              AU
+              {initials}
             </div>
             <div className="side-text" style={{ margin: 0, display: 'flex', flexDirection: 'column' }}>
-              <span style={{ fontSize: '14px', fontWeight: 600, color: 'white' }}>Admin User</span>
-              <span style={{ fontSize: '11px', color: 'var(--text-muted)' }}>admin@vocalarmor.com</span>
+              <span style={{ fontSize: '14px', fontWeight: 600, color: 'white' }}>{profile.firstName} {profile.lastName}</span>
+              <span style={{ fontSize: '11px', color: 'var(--text-muted)' }}>{profile.email}</span>
             </div>
           </div>
           
