@@ -6,3 +6,25 @@ __pycache__/
 *.mp3
 data/
 models/
+
+# Sensitive Environment Configurations
+.env
+src/.env
+
+# Local Databases
+*.db
+vocal_armor.db
+
+# Developer scratchpad / scripts
+src/test_db.py
+
+# Frontend dependencies and builds
+node_modules/
+dist/
+frontend/node_modules/
+frontend/dist/
+
+# System / Editor configurations
+.DS_Store
+.vscode/
+.idea/

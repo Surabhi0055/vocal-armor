@@ -1,6 +1,13 @@
+from dotenv import load_dotenv
+from pathlib import Path
+load_dotenv(dotenv_path=Path(__file__).parent.parent / ".env")  # always load root .env
+
 from fastapi import FastAPI, File, UploadFile, HTTPException, WebSocket, Form
 from fastapi.responses import JSONResponse
 from fastapi.middleware.cors import CORSMiddleware
+from starlette.middleware.sessions import SessionMiddleware
+from database import create_tables
+from routers.auth_router import router as auth_router
 import uvicorn
 import os
 import tempfile
@@ -17,14 +24,32 @@ app = FastAPI(
     version="1.2",
 )
 
+# Enable sessions (for Google OAuth callback states)
+app.add_middleware(SessionMiddleware, secret_key=os.getenv("SECRET_KEY", "change-me"))
+
 # CORS 
 app.add_middleware(
     CORSMiddleware,
-    allow_origins=["*"],      
+    allow_origins=[
+        "http://localhost:5173", 
+        "http://localhost:5174", 
+        "http://localhost:5175", 
+        "http://127.0.0.1:5173", 
+        "http://127.0.0.1:5174"
+    ],      
     allow_credentials=True,
     allow_methods=["*"],
     allow_headers=["*"],
 )
+
+# Mount the Authentication Router
+app.include_router(auth_router)
+
+# Create tables on startup
+@app.on_event("startup")
+def startup():
+    create_tables()
+    print("Database tables created")
 
 engines = load_vocal_armor()
 
@@ -129,6 +154,7 @@ async def predict_audio(file: UploadFile = File(...), model: str = Form("best"))
 
 @app.post("/predict-url", tags=["Detection"])
 async def predict_from_url(url: str, model: str = "best"):
+    
     import yt_dlp
     import re
 

@@ -1,16 +1,21 @@
 import React, { useState } from 'react';
 import { Link } from 'react-router-dom';
-import { useUser } from '../UserContext';
+import { useAuthStore } from '../store/authStore';
 
 const UserPage = () => {
-  const { profile, setProfile } = useUser();
+  const { user } = useAuthStore();
+  
+  const fullName = user?.full_name || 'Admin User';
+  const nameParts = fullName.trim().split(' ');
+  const first = nameParts[0] || '';
+  const last = nameParts.length > 1 ? nameParts[nameParts.length - 1] : '';
 
   // State for the edit forms (Right Column)
   const [editForm, setEditForm] = useState({
-    firstName: profile.firstName,
-    lastName: profile.lastName,
-    email: profile.email,
-    phone: profile.phone
+    firstName: first,
+    lastName: last,
+    email: user?.email || '',
+    phone: ''
   });
 
   // Preferences State
@@ -29,7 +34,7 @@ const UserPage = () => {
     setIsSaving(true);
     // Simulate a network request
     setTimeout(() => {
-      setProfile({ ...editForm });
+      // Future: send update to backend API
       setIsSaving(false);
       // Optional: Show a tiny success animation or toast here instead of alert
     }, 600);
@@ -60,8 +65,8 @@ const UserPage = () => {
             <div style={{ width: '120px', height: '120px', borderRadius: '50%', background: 'rgba(0, 212, 200, 0.1)', border: '2px solid rgba(0, 212, 200, 0.3)', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: '48px', color: '#00d4c8', marginBottom: '24px', boxShadow: '0 0 40px rgba(0,212,200,0.2)' }}>
               <i className="ti ti-user-circle"></i>
             </div>
-            <div style={{ fontSize: '24px', fontWeight: 600, color: 'white', marginBottom: '8px' }}>{profile.firstName} {profile.lastName}</div>
-            <div style={{ color: '#7ea8a4', fontSize: '14px', marginBottom: '24px' }}>{profile.email}</div>
+            <div style={{ fontSize: '24px', fontWeight: 600, color: 'white', marginBottom: '8px' }}>{fullName}</div>
+            <div style={{ color: '#7ea8a4', fontSize: '14px', marginBottom: '24px' }}>{user?.email || 'admin@vocalarmor.com'}</div>
             
             <div style={{ background: 'rgba(232, 82, 30, 0.1)', color: '#e8521e', padding: '6px 16px', borderRadius: '100px', fontSize: '12px', fontWeight: 700, letterSpacing: '1px', border: '1px solid rgba(232, 82, 30, 0.3)' }}>
               ENTERPRISE ADMIN

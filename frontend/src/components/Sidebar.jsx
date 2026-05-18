@@ -1,10 +1,17 @@
 import React from 'react';
 import { NavLink } from 'react-router-dom';
-import { useUser } from '../UserContext';
+import { useAuthStore } from '../store/authStore';
 
 const Sidebar = () => {
-  const { profile } = useUser();
-  const initials = (profile.firstName[0] + profile.lastName[0]).toUpperCase();
+  const { user } = useAuthStore();
+  
+  const fullName = user?.full_name || 'Admin User';
+  const email = user?.email || 'admin@vocalarmor.com';
+  
+  const nameParts = fullName.trim().split(' ');
+  const first = nameParts[0] || '';
+  const last = nameParts.length > 1 ? nameParts[nameParts.length - 1] : '';
+  const initials = ((first[0] || '') + (last[0] || '')).toUpperCase() || 'VA';
 
   return (
     <div className="sidebar">
@@ -52,8 +59,8 @@ const Sidebar = () => {
               {initials}
             </div>
             <div className="side-text" style={{ margin: 0, display: 'flex', flexDirection: 'column' }}>
-              <span style={{ fontSize: '14px', fontWeight: 600, color: 'white' }}>{profile.firstName} {profile.lastName}</span>
-              <span style={{ fontSize: '11px', color: 'var(--text-muted)' }}>{profile.email}</span>
+              <span style={{ fontSize: '14px', fontWeight: 600, color: 'white' }}>{fullName}</span>
+              <span style={{ fontSize: '11px', color: 'var(--text-muted)' }}>{email}</span>
             </div>
           </div>
           

@@ -1,6 +1,6 @@
 import React, { useState, useRef, useEffect } from 'react';
-import { Link } from 'react-router-dom';
-import { useUser } from '../UserContext';
+import { Link, useNavigate } from 'react-router-dom';
+import { useAuthStore } from '../store/authStore';
 
 const Navbar = () => {
   const [isSearchActive, setIsSearchActive] = useState(false);
@@ -10,8 +10,14 @@ const Navbar = () => {
   
   const searchInputRef = useRef(null);
   
-  const { profile } = useUser();
-  const initials = (profile.firstName[0] + profile.lastName[0]).toUpperCase();
+  const navigate = useNavigate();
+  const { user, logout } = useAuthStore();
+  
+  const fullName = user?.full_name || 'Admin User';
+  const nameParts = fullName.trim().split(' ');
+  const first = nameParts[0] || '';
+  const last = nameParts.length > 1 ? nameParts[nameParts.length - 1] : '';
+  const initials = ((first[0] || '') + (last[0] || '')).toUpperCase() || 'VA';
 
   // Handle clicking outside of dropdowns to close them
   useEffect(() => {
@@ -187,7 +193,12 @@ const Navbar = () => {
                 <i className="ti ti-settings" style={{ fontSize: '16px', color: '#7ea8a4' }}></i> Preferences
               </Link>
               <div style={{ width: '100%', height: '1px', background: 'rgba(255,255,255,0.1)' }}></div>
-              <div style={{ padding: '12px 16px', color: '#e8521e', cursor: 'pointer', fontSize: '13px', display: 'flex', alignItems: 'center', gap: '8px', transition: 'background 0.2s' }} onMouseOver={(e) => e.target.style.background = 'rgba(232,82,30,0.1)'} onMouseOut={(e) => e.target.style.background = 'transparent'}>
+              <div 
+                onClick={() => { logout(); navigate('/login'); }} 
+                style={{ padding: '12px 16px', color: '#e8521e', cursor: 'pointer', fontSize: '13px', display: 'flex', alignItems: 'center', gap: '8px', transition: 'background 0.2s' }} 
+                onMouseOver={(e) => e.target.style.background = 'rgba(232,82,30,0.1)'} 
+                onMouseOut={(e) => e.target.style.background = 'transparent'}
+              >
                 <i className="ti ti-logout" style={{ fontSize: '16px' }}></i> Log Out
               </div>
             </div>
