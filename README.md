@@ -1,4 +1,4 @@
-# 🛡️ Vocal-Armor
+# Vocal-Armor
 
 > **Real-Time Deepfake Voice Detection Engine**
 > A state-of-the-art CNN-based pipeline that processes voice audio into Mel spectrograms and instantly classifies them as **REAL (human)** or **FAKE (AI-generated)** using deep learning.
@@ -15,7 +15,7 @@
 
 ---
 
-## 📖 Overview
+## Overview
 
 Vocal-Armor is a comprehensive B.Tech engineering system designed to combat the rising threat of **AI voice cloning, deepfake audio frauds, and social engineering attacks**. 
 
@@ -23,9 +23,19 @@ By pairing a custom-trained **Convolutional Neural Network (CNN)** backend with 
 
 ---
 
-## ✨ Features
+## Project Status
 
-### 🧠 Backend (Deep Learning & APIs)
+* **Phase 1: Data Preparation & Preprocessing** — Complete *(Mel Spectrogram generation, DSP audio windowing)*
+* **Phase 2: CNN Model Training** — Complete *(Custom multi-layer TF/Keras model experiments)*
+* **Phase 3: Inference Pipeline** — Complete *(Model binary predictions via file/buffer formats)*
+* **Phase 4: REST API (FastAPI)** — Live *(Multi-format validation, YouTube yt_dlp extractor, WebSockets streaming)*
+* **Phase 5: Interactive Frontend Dashboard** — Live *(Vite + React, SQLite logging history, Google & GitHub OAuth)*
+
+---
+
+## Features
+
+### Backend (Deep Learning & APIs)
 * **High-Accuracy CNN Classifier**: Custom trained on the *Fake-or-Real (FoR)* dataset with validation accuracy exceeding **85%**.
 * **Real-Time Stream Inference (WebSockets)**: Streams live audio bytes from the client to `/ws/live` for immediate, low-latency predictions.
 * **Remote Media Analytics (`yt_dlp` + `FFmpeg`)**: Paste any remote media link (YouTube, SoundCloud, direct audio URLs) and instantly validate the voice audio.
@@ -33,7 +43,7 @@ By pairing a custom-trained **Convolutional Neural Network (CNN)** backend with 
 * **Database Integrations**: Persists history records, batch sessions, and profile settings in a structured SQLite database via SQLAlchemy.
 * **OAuth 2.0 Integration**: Supports secure, instant login callbacks using **Google** and **GitHub**.
 
-### 💻 Frontend (Client Dashboard)
+### Frontend (Client Dashboard)
 * **Stunning Glassmorphism Design**: High-fidelity, premium dark-mode interface built with CSS-based micro-animations and glowing interactive components.
 * **Live Audio Capture Monitor**: Real-time microphone recorder that streams raw audio via WebSockets to show immediate deepfake probability.
 * **Batch Analytics Control**: Upload dozens of audio files in a single session to check multiple profiles simultaneously.
@@ -42,7 +52,7 @@ By pairing a custom-trained **Convolutional Neural Network (CNN)** backend with 
 
 ---
 
-## 🛠️ Tech Stack
+## Tech Stack
 
 ### Deep Learning & Processing
 * **TensorFlow / Keras** — Model construction, custom layers, and inference execution.
@@ -62,7 +72,7 @@ By pairing a custom-trained **Convolutional Neural Network (CNN)** backend with 
 
 ---
 
-## 📊 System Architecture & Approach
+## System Architecture & Approach
 
 Vocal-Armor's voice validation workflow follows a rigorous pipeline:
 
@@ -96,7 +106,7 @@ Input Shape: (128, 128, 3)
 
 ---
 
-## 🚀 Setup & Execution Guide
+## Setup & Execution Guide
 
 ### 1. Backend Setup
 1. Navigate to the backend or project root folder:
@@ -145,7 +155,7 @@ Input Shape: (128, 128, 3)
 
 ---
 
-## 🔌 API Documentation
+## API Documentation
 
 ### 1. Health Status
 * **Endpoint**: `GET /health`
@@ -199,7 +209,7 @@ Input Shape: (128, 128, 3)
 
 ---
 
-## 📂 Project Structure
+## Project Structure
 
 ```
 vocal-armor-engine/
@@ -232,7 +242,7 @@ vocal-armor-engine/
 
 ---
 
-## 📈 Research & Results
+## Research & Results
 
 | Parameter | Specification |
 | --- | --- |
@@ -242,4 +252,4 @@ vocal-armor-engine/
 | **Supported Extensions** | WAV, MP3, FLAC, OGG, M4A, AAC |
 | **Response Latency** | **< 150ms** for processed segments |
 
-Our validation matrix proves a strong ability to classify complex audio files, including low-quality phone calls and noisy synthetic recordings, making **Vocal-Armor** a robust shield against audio manipulation. 🛡️
+Our validation matrix proves a strong ability to classify complex audio files, including low-quality phone calls and noisy synthetic recordings, making **Vocal-Armor** a robust shield against audio manipulation.
