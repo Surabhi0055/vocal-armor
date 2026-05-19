@@ -514,6 +514,22 @@ const Dashboard = () => {
           <div className="accuracy-desc">Total voice samples analyzed since public launch</div>
         </div>
       </div>
+
+      {/* ── FOOTER ── */}
+      <footer style={{ marginTop: 'auto', borderTop: '1px solid rgba(255,255,255,0.06)', paddingTop: '30px', paddingBottom: '10px', display: 'flex', alignItems: 'center', justifyContent: 'space-between', flexWrap: 'wrap', gap: '14px' }}>
+        <div style={{ display: 'flex', alignItems: 'center', gap: '9px', cursor: 'pointer' }} onClick={() => window.scrollTo({ top: 0, behavior: 'smooth' })}>
+          <div style={{ width: '22px', height: '22px', background: 'linear-gradient(135deg,#e84d1c,#b83510)', borderRadius: '4px', display: 'flex', alignItems: 'center', justifyContent: 'center', fontFamily: '"Syne", sans-serif', fontWeight: 800, fontSize: '11px', color: '#fff' }}>V</div>
+          <span style={{ fontFamily: '"DM Mono", monospace', fontSize: '12px', color: '#7a8f94' }}>VocalArmor · MIT License</span>
+        </div>
+        <div style={{ display: 'flex', gap: '26px' }}>
+          <span style={{ fontFamily: "'Epilogue',sans-serif", fontSize: '13px', color: '#7a8f94', cursor: 'pointer', transition: 'color .2s' }} onMouseOver={e => e.currentTarget.style.color = '#fff'} onMouseOut={e => e.currentTarget.style.color = '#7a8f94'}>About Us</span>
+          <span style={{ fontFamily: "'Epilogue',sans-serif", fontSize: '13px', color: '#7a8f94', cursor: 'pointer', transition: 'color .2s' }} onMouseOver={e => e.currentTarget.style.color = '#fff'} onMouseOut={e => e.currentTarget.style.color = '#7a8f94'}>How It Works</span>
+          <span style={{ fontFamily: "'Epilogue',sans-serif", fontSize: '13px', color: '#7a8f94', cursor: 'pointer', transition: 'color .2s' }} onMouseOver={e => e.currentTarget.style.color = '#fff'} onMouseOut={e => e.currentTarget.style.color = '#7a8f94'}>Features</span>
+          <span style={{ fontFamily: "'Epilogue',sans-serif", fontSize: '13px', color: '#7a8f94', cursor: 'pointer', transition: 'color .2s' }} onClick={() => window.open('https://github.com', '_blank')} onMouseOver={e => e.currentTarget.style.color = '#fff'} onMouseOut={e => e.currentTarget.style.color = '#7a8f94'}>GitHub</span>
+          <span style={{ fontFamily: "'Epilogue',sans-serif", fontSize: '13px', color: '#7a8f94', cursor: 'pointer', transition: 'color .2s' }} onMouseOver={e => e.currentTarget.style.color = '#fff'} onMouseOut={e => e.currentTarget.style.color = '#7a8f94'}>Privacy</span>
+        </div>
+        <span style={{ fontFamily: '"DM Mono", monospace', fontSize: '11px', color: 'rgba(29,207,207,0.45)', letterSpacing: '0.05em' }}>Built with TensorFlow · FastAPI</span>
+      </footer>
     </div>
   );
 };

@@ -3,6 +3,7 @@ import { BrowserRouter, Routes, Route, Navigate } from 'react-router-dom';
 import { useAuthStore } from './store/authStore';
 import AuthPage from './pages/AuthPage';
 import AuthCallback from './pages/AuthCallback';
+import LandingPage from './pages/LandingPage';
 import ProtectedRoute from './components/ProtectedRoute';
 
 // Existing layout core components
@@ -52,6 +53,7 @@ function App() {
     <BrowserRouter>
       <Routes>
         {/* Open Authentication screens */}
+        <Route path="/start" element={<LandingPage />} />
         <Route path="/login" element={<AuthPage />} />
         <Route path="/auth/callback" element={<AuthCallback />} />
         
