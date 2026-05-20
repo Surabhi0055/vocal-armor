@@ -1,16 +1,17 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { Link } from 'react-router-dom';
 import { useAuthStore } from '../store/authStore';
+import { getPrefs, savePrefs, getHistory } from '../utils/storage';
+import Footer from './Footer';
 
 const UserPage = () => {
   const { user } = useAuthStore();
   
-  const fullName = user?.full_name || 'Admin User';
+  const fullName = user?.full_name || user?.username || 'User';
   const nameParts = fullName.trim().split(' ');
   const first = nameParts[0] || '';
   const last = nameParts.length > 1 ? nameParts[nameParts.length - 1] : '';
 
-  // State for the edit forms (Right Column)
   const [editForm, setEditForm] = useState({
     firstName: first,
     lastName: last,
@@ -18,12 +19,28 @@ const UserPage = () => {
     phone: ''
   });
 
-  // Preferences State
   const [strictFilter, setStrictFilter] = useState(true);
   const [autoSave, setAutoSave] = useState(true);
   const [emailAlerts, setEmailAlerts] = useState(false);
-
   const [isSaving, setIsSaving] = useState(false);
+  const [scanCount, setScanCount] = useState(0);
+
+  // Load per-user prefs and scan count when user changes
+  useEffect(() => {
+    const prefs = getPrefs();
+    setStrictFilter(prefs.strictFilter);
+    setAutoSave(prefs.autoSave);
+    setEmailAlerts(prefs.emailAlerts);
+    setEditForm(prev => ({
+      ...prev,
+      firstName: first,
+      lastName: last,
+      email: user?.email || '',
+      phone: prefs.phone || ''
+    }));
+    setScanCount(getHistory().length);
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [user?.id, user?.email]);
 
   const handleInputChange = (e) => {
     const { name, value } = e.target;
@@ -32,12 +49,9 @@ const UserPage = () => {
 
   const handleSave = () => {
     setIsSaving(true);
-    // Simulate a network request
-    setTimeout(() => {
-      // Future: send update to backend API
-      setIsSaving(false);
-      // Optional: Show a tiny success animation or toast here instead of alert
-    }, 600);
+    // Persist preferences to this user's scoped storage
+    savePrefs({ strictFilter, autoSave, emailAlerts, phone: editForm.phone });
+    setTimeout(() => setIsSaving(false), 600);
   };
 
   return (
@@ -76,7 +90,7 @@ const UserPage = () => {
 
             <div style={{ display: 'flex', justifyContent: 'space-between', width: '100%', marginBottom: '16px' }}>
               <span style={{ color: '#7ea8a4', fontSize: '14px' }}>Total Scans</span>
-              <span style={{ color: 'white', fontWeight: 600 }}>1,248</span>
+              <span style={{ color: 'white', fontWeight: 600 }}>{scanCount.toLocaleString()}</span>
             </div>
             <div style={{ display: 'flex', justifyContent: 'space-between', width: '100%' }}>
               <span style={{ color: '#7ea8a4', fontSize: '14px' }}>Detection Accuracy</span>
@@ -194,6 +208,8 @@ const UserPage = () => {
 
         </div>
       </div>
+      
+      <Footer />
       
       <style>{`
         @keyframes spin { 100% { transform: rotate(360deg); } }

@@ -1,6 +1,7 @@
 import React, { useState, useRef } from 'react';
 import { saveAnalysis } from '../utils/storage';
 import ModelSelector from './ModelSelector';
+import Footer from './Footer';
 
 const BatchUploadPage = () => {
   const [files, setFiles] = useState([]);
@@ -271,6 +272,7 @@ const BatchUploadPage = () => {
         </>
       )}
 
+      <Footer />
     </div>
   );
 };

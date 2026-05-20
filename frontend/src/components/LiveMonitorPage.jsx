@@ -1,6 +1,7 @@
 import React, { useState, useRef, useEffect, useCallback } from 'react';
 import { saveAnalysis } from '../utils/storage';
 import ModelSelector from './ModelSelector';
+import Footer from './Footer';
 
 // ── WAV encoder (pure JS, no libraries needed) ─────────────────────────────
 function encodeWAV(samples, sampleRate) {
@@ -459,6 +460,7 @@ const LiveMonitorPage = () => {
         </div>
       )}
 
+      <Footer />
     </div>
   );
 };

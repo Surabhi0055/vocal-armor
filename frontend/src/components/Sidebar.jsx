@@ -1,6 +1,7 @@
 import React from 'react';
 import { NavLink } from 'react-router-dom';
 import { useAuthStore } from '../store/authStore';
+import VAIcon from './VAIcon';
 
 const Sidebar = () => {
   const { user } = useAuthStore();
@@ -17,9 +18,9 @@ const Sidebar = () => {
     <div className="sidebar">
       <div className="sidebar-header">
         <div className="sidebar-logo-icon">
-          <i className="ti ti-waveform"></i>
+          <VAIcon size={32} style={{ borderRadius: '8px' }} />
         </div>
-        <span className="sidebar-logo-text">VOCAL<span style={{fontWeight: 300}}>ARMOR</span></span>
+        <span className="sidebar-logo-text" style={{ fontFamily: '"Space Grotesk", sans-serif', letterSpacing: '1px', fontSize: '13px' }}><span style={{ fontWeight: 800, color: '#fff' }}>VOCAL</span><span style={{ fontWeight: 300, color: '#1dcfcf' }}>ARMOR</span></span>
       </div>
 
       <div className="sidebar-top">

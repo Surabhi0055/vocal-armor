@@ -1,5 +1,6 @@
 import React, { useState, useEffect, useCallback } from "react";
 import { getHistory } from "../utils/storage";
+import Footer from "./Footer";
 
 // Lazy imports with error boundaries to isolate crashes
 let FakeRateChart, ConfidenceHistogram, HistoryTable;
@@ -161,6 +162,7 @@ const HistoryPage = () => {
         </React.Suspense>
       </ErrorBoundary>
 
+      <Footer />
     </div>
   );
 };

@@ -1,6 +1,7 @@
 import React, { useState, useRef, useEffect } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import { useAuthStore } from '../store/authStore';
+import VAIcon from './VAIcon';
 
 const Navbar = () => {
   const [isSearchActive, setIsSearchActive] = useState(false);
@@ -55,9 +56,8 @@ const Navbar = () => {
       
       {/* Left side heading */}
       <div style={{ flex: 1, display: 'flex', justifyContent: 'flex-start' }}>
-        <Link to="/start" style={{ textDecoration: 'none', display: 'flex', alignItems: 'center', gap: '8px' }}>
-          <div style={{ width: '28px', height: '28px', background: 'linear-gradient(135deg,#e84d1c,#b83510)', borderRadius: '6px', display: 'flex', alignItems: 'center', justifyContent: 'center', fontFamily: '"Syne", sans-serif', fontWeight: 800, fontSize: '14px', color: '#fff' }}>V</div>
-          <span style={{ color: 'white', fontWeight: 700, fontSize: '18px', letterSpacing: '1px', fontFamily: '"Syne", sans-serif' }}>VocalArmor</span>
+        <Link to="/start" style={{ textDecoration: 'none', display: 'flex', alignItems: 'center', gap: '10px' }}>
+          <span style={{ fontFamily: '"Space Grotesk", sans-serif', fontSize: '18px', letterSpacing: '1px', color: '#fff' }}><span style={{ fontWeight: 800 }}>VOCAL</span><span style={{ fontWeight: 300, color: '#1dcfcf' }}>ARMOR</span></span>
         </Link>
       </div>
       

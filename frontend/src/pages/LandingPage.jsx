@@ -2,13 +2,14 @@ import React, { useEffect, useRef, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useAuthStore } from '../store/authStore';
 import WaveformBackground from '../components/WaveformBackground';
+import VAIcon from '../components/VAIcon';
 
 const G = `
-@import url('https://fonts.googleapis.com/css2?family=Syne:wght@400;600;700;800&family=Epilogue:wght@300;400;500&family=DM+Mono&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Bebas+Neue&family=Syne:wght@400;500;600;700;800&family=Space+Grotesk:wght@300;400;500;600;700;800&display=swap');
 :root{--bg:#050c0e;--ember:#e84d1c;--cyan:#1dcfcf;--muted:#7a8f94;}
 *,*::before,*::after{box-sizing:border-box;margin:0;padding:0;}
 html{scroll-behavior:smooth;}
-body{background:var(--bg);font-family:'Epilogue',sans-serif;cursor:none;overflow-x:hidden;}
+body{background:var(--bg);font-family:'Space Grotesk',sans-serif;cursor:none;overflow-x:hidden;}
 #cd{width:10px;height:10px;background:var(--cyan);border-radius:50%;position:fixed;pointer-events:none;z-index:9999;transform:translate(-50%,-50%);}
 #cr{width:36px;height:36px;border:1.5px solid var(--cyan);border-radius:50%;position:fixed;pointer-events:none;z-index:9998;transform:translate(-50%,-50%);transition:width .3s,height .3s;opacity:.6;}
 .fu{opacity:0;transform:translateY(24px);transition:opacity .6s cubic-bezier(.4,0,.2,1),transform .6s cubic-bezier(.4,0,.2,1);}
@@ -19,11 +20,11 @@ body{background:var(--bg);font-family:'Epilogue',sans-serif;cursor:none;overflow
 .fr.v{opacity:1;transform:none;}
 .gl{background:rgba(12,26,31,.65);backdrop-filter:blur(14px) saturate(1.4);border:1px solid rgba(255,255,255,.07);border-radius:16px;transition:border-color .3s;}
 .gl:hover{border-color:rgba(29,207,207,.25);}
-.nl{font-family:'Syne',sans-serif;font-size:13px;font-weight:600;color:var(--muted);cursor:pointer;letter-spacing:.04em;transition:color .2s;}
+.nl{font-family:'Space Grotesk',sans-serif;font-size:13px;font-weight:600;color:var(--muted);cursor:pointer;letter-spacing:.04em;transition:color .2s;}
 .nl:hover{color:#fff;}
-.bp{font-family:'Syne',sans-serif;font-size:14px;font-weight:600;padding:12px 28px;border-radius:10px;border:none;cursor:pointer;background:linear-gradient(90deg,#e84d1c,#1dcfcf);color:#fff;letter-spacing:.04em;transition:opacity .2s,transform .2s;}
+.bp{font-family:'Space Grotesk',sans-serif;font-size:14px;font-weight:700;padding:12px 28px;border-radius:10px;border:none;cursor:pointer;background:linear-gradient(90deg,#e84d1c,#1dcfcf);color:#fff;letter-spacing:.04em;transition:opacity .2s,transform .2s;}
 .bp:hover{opacity:.85;transform:scale(1.03);}
-.bg{font-family:'Syne',sans-serif;font-size:14px;font-weight:600;padding:12px 28px;border-radius:10px;border:1px solid rgba(29,207,207,.3);cursor:pointer;background:transparent;color:#1dcfcf;letter-spacing:.04em;transition:background .2s;}
+.bg{font-family:'Space Grotesk',sans-serif;font-size:14px;font-weight:600;padding:12px 28px;border-radius:10px;border:1px solid rgba(29,207,207,.3);cursor:pointer;background:transparent;color:#1dcfcf;letter-spacing:.04em;transition:background .2s;}
 .bg:hover{background:rgba(29,207,207,.08);}
 
 /* Bento Box Styles */
@@ -42,12 +43,12 @@ body{background:var(--bg);font-family:'Epilogue',sans-serif;cursor:none;overflow
 .num-circle-dark {
   width: 36px; height: 36px; border-radius: 50%; background: #fff; color: #000;
   display: flex; align-items: center; justify-content: center;
-  font-family: 'Syne', sans-serif; font-weight: 700; font-size: 13px; margin-bottom: 40px;
+  font-family: 'Space Grotesk', sans-serif; font-weight: 700; font-size: 13px; margin-bottom: 40px;
 }
 .num-circle-light {
   width: 36px; height: 36px; border-radius: 50%; background: #000; color: #fff;
   display: flex; align-items: center; justify-content: center;
-  font-family: 'Syne', sans-serif; font-weight: 700; font-size: 13px; margin-bottom: 40px;
+  font-family: 'Space Grotesk', sans-serif; font-weight: 700; font-size: 13px; margin-bottom: 40px;
 }
 `;
 
@@ -110,7 +111,12 @@ export default function LandingPage() {
   }, []);
 
 
-  const S = { syne: { fontFamily: "'Syne',sans-serif" }, epi: { fontFamily: "'Epilogue',sans-serif" }, mono: { fontFamily: "'DM Mono',monospace" } };
+  const S = {
+    syne:  { fontFamily: "'Syne', sans-serif" },          // headings & feature titles
+    epi:   { fontFamily: "'Syne', sans-serif" },           // descriptive / body text
+    mono:  { fontFamily: "'Space Grotesk', sans-serif", letterSpacing: '0.05em' }, // section labels & tags
+    bebas: { fontFamily: "'Bebas Neue', sans-serif" },    // hero title
+  };
 
   const navLinks = [
     { label: 'About Us', id: 'about' },
@@ -144,8 +150,8 @@ export default function LandingPage() {
           transition: 'border-color 0.4s',
         }}>
           <div style={{ display: 'flex', alignItems: 'center', gap: '10px', cursor: 'pointer' }} onClick={() => scrollTo('hero')}>
-            <div style={{ width: '28px', height: '28px', background: 'linear-gradient(135deg,#e84d1c,#b83510)', borderRadius: '6px', display: 'flex', alignItems: 'center', justifyContent: 'center', ...S.syne, fontWeight: 800, fontSize: '14px', color: '#fff' }}>V</div>
-            <span style={{ ...S.syne, fontWeight: 700, fontSize: '17px', color: '#fff' }}>VocalArmor</span>
+          <VAIcon size={32} style={{ borderRadius: '6px' }} />
+            <span style={{ fontFamily: '"Space Grotesk", sans-serif', fontSize: '17px', letterSpacing: '1px', color: '#fff' }}><span style={{ fontWeight: 800 }}>VOCAL</span><span style={{ fontWeight: 300, color: '#1dcfcf' }}>ARMOR</span></span>
           </div>
           <div style={{ display: 'flex', gap: '32px' }}>
             {navLinks.map(l => (
@@ -169,7 +175,7 @@ export default function LandingPage() {
 
         {/* ── HERO ── */}
         <section id="hero" style={{ minHeight: '90vh', display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', textAlign: 'center', padding: '80px 6% 60px' }}>
-          <h1 className="hero-title" style={{ fontFamily: '"Bebas Neue", sans-serif' }}>
+          <h1 className="hero-title" style={{ ...S.bebas }}>
             DETECT AI <span style={{ color: '#e84d1c' }}>VOICES</span>
             <br />
             BEFORE THEY{" "}
@@ -305,8 +311,8 @@ export default function LandingPage() {
         {/* ── FOOTER ── */}
         <footer style={{ borderTop: '1px solid rgba(255,255,255,0.06)', padding: '30px 6%', display: 'flex', alignItems: 'center', justifyContent: 'space-between', flexWrap: 'wrap', gap: '14px' }}>
           <div style={{ display: 'flex', alignItems: 'center', gap: '9px', cursor: 'pointer' }} onClick={() => scrollTo('hero')}>
-            <div style={{ width: '22px', height: '22px', background: 'linear-gradient(135deg,#e84d1c,#b83510)', borderRadius: '4px', display: 'flex', alignItems: 'center', justifyContent: 'center', fontFamily: '"Syne", sans-serif', fontWeight: 800, fontSize: '11px', color: '#fff' }}>V</div>
-            <span style={{ fontFamily: '"DM Mono", monospace', fontSize: '12px', color: '#7a8f94' }}>VocalArmor · MIT License</span>
+            <VAIcon size={22} style={{ borderRadius: '4px' }} />
+            <span style={{ fontFamily: '"Space Grotesk", sans-serif', fontSize: '11px', color: '#7a8f94', letterSpacing: '1px' }}><span style={{ fontWeight: 800 }}>VOCAL</span><span style={{ fontWeight: 300, color: '#1dcfcf' }}>ARMOR</span></span><span style={{ fontFamily: '"DM Mono", monospace', fontSize: '12px', color: '#7a8f94' }}> · MIT License</span>
           </div>
           <div style={{ display: 'flex', gap: '26px' }}>
             {footerLinks.map(l => (

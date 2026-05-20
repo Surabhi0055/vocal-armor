@@ -62,6 +62,8 @@ export const useAuthStore = create(
                 }
                 Cookies.remove('va_refresh');
                 set({ user: null, accessToken: null, refreshToken: null });
+                // Notify all components that history has changed (now empty for next user)
+                window.dispatchEvent(new Event('va_history_updated'));
             },
 
             refreshAccessToken: async () => {

@@ -1,6 +1,7 @@
 import React, { useState, useRef, useEffect, useCallback } from "react";
 import { saveAnalysis } from "../utils/storage";
 import ModelSelector from './ModelSelector';
+import Footer from './Footer';
 
 const Dashboard = () => {
   const [file, setFile] = useState(null);
@@ -447,45 +448,6 @@ const Dashboard = () => {
         )}
       </div>
 
-      {/* ── Stats ── */}
-      <div className="stats-row">
-        <div className="stat-pill"><strong>31K+</strong> voices analyzed</div>
-        <div className="stat-pill"><strong>98.1%</strong> val accuracy</div>
-        <div className="stat-pill"><strong>&lt;2s</strong> detection time</div>
-        <div className="stat-pill"><strong>7</strong> audio formats</div>
-        <div className="stat-pill"><strong>0.3%</strong> false negatives</div>
-      </div>
-
-      <div className="section-divider">
-        <span className="section-divider-text">HOW IT WORKS</span>
-      </div>
-
-      <div className="hiw-grid">
-        <div className="hiw-card">
-          <div className="hiw-step-number">1</div>
-          <div className="hiw-title">Audio Ingestion</div>
-          <div className="hiw-desc">
-            Loads audio, forces mono channel, and resamples to 22.05 kHz for
-            uniform analysis input across all supported formats.
-          </div>
-        </div>
-        <div className="hiw-card">
-          <div className="hiw-step-number">2</div>
-          <div className="hiw-title">Mel Spectrogram</div>
-          <div className="hiw-desc">
-            Converts the loudest 2-second window into a 128×128 mel spectrogram
-            image for deep visual pattern recognition.
-          </div>
-        </div>
-        <div className="hiw-card">
-          <div className="hiw-step-number">3</div>
-          <div className="hiw-title">CNN Inference</div>
-          <div className="hiw-desc">
-            VocalArmor's proprietary CNN model classifies the spectrogram as a
-            real human voice or an AI-generated deepfake.
-          </div>
-        </div>
-      </div>
 
       <div className="section-divider">
         <span className="section-divider-text">MODEL ACCURACY</span>
@@ -515,21 +477,9 @@ const Dashboard = () => {
         </div>
       </div>
 
+
       {/* ── FOOTER ── */}
-      <footer style={{ marginTop: 'auto', borderTop: '1px solid rgba(255,255,255,0.06)', paddingTop: '30px', paddingBottom: '10px', display: 'flex', alignItems: 'center', justifyContent: 'space-between', flexWrap: 'wrap', gap: '14px' }}>
-        <div style={{ display: 'flex', alignItems: 'center', gap: '9px', cursor: 'pointer' }} onClick={() => window.scrollTo({ top: 0, behavior: 'smooth' })}>
-          <div style={{ width: '22px', height: '22px', background: 'linear-gradient(135deg,#e84d1c,#b83510)', borderRadius: '4px', display: 'flex', alignItems: 'center', justifyContent: 'center', fontFamily: '"Syne", sans-serif', fontWeight: 800, fontSize: '11px', color: '#fff' }}>V</div>
-          <span style={{ fontFamily: '"DM Mono", monospace', fontSize: '12px', color: '#7a8f94' }}>VocalArmor · MIT License</span>
-        </div>
-        <div style={{ display: 'flex', gap: '26px' }}>
-          <span style={{ fontFamily: "'Epilogue',sans-serif", fontSize: '13px', color: '#7a8f94', cursor: 'pointer', transition: 'color .2s' }} onMouseOver={e => e.currentTarget.style.color = '#fff'} onMouseOut={e => e.currentTarget.style.color = '#7a8f94'}>About Us</span>
-          <span style={{ fontFamily: "'Epilogue',sans-serif", fontSize: '13px', color: '#7a8f94', cursor: 'pointer', transition: 'color .2s' }} onMouseOver={e => e.currentTarget.style.color = '#fff'} onMouseOut={e => e.currentTarget.style.color = '#7a8f94'}>How It Works</span>
-          <span style={{ fontFamily: "'Epilogue',sans-serif", fontSize: '13px', color: '#7a8f94', cursor: 'pointer', transition: 'color .2s' }} onMouseOver={e => e.currentTarget.style.color = '#fff'} onMouseOut={e => e.currentTarget.style.color = '#7a8f94'}>Features</span>
-          <span style={{ fontFamily: "'Epilogue',sans-serif", fontSize: '13px', color: '#7a8f94', cursor: 'pointer', transition: 'color .2s' }} onClick={() => window.open('https://github.com', '_blank')} onMouseOver={e => e.currentTarget.style.color = '#fff'} onMouseOut={e => e.currentTarget.style.color = '#7a8f94'}>GitHub</span>
-          <span style={{ fontFamily: "'Epilogue',sans-serif", fontSize: '13px', color: '#7a8f94', cursor: 'pointer', transition: 'color .2s' }} onMouseOver={e => e.currentTarget.style.color = '#fff'} onMouseOut={e => e.currentTarget.style.color = '#7a8f94'}>Privacy</span>
-        </div>
-        <span style={{ fontFamily: '"DM Mono", monospace', fontSize: '11px', color: 'rgba(29,207,207,0.45)', letterSpacing: '0.05em' }}>Built with TensorFlow · FastAPI</span>
-      </footer>
+      <Footer />
     </div>
   );
 };
