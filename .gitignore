@@ -1,30 +1,45 @@
+# ── Python Environment ────────────────────────────────────────────────────────
 venv/
-.DS_Store
 __pycache__/
+*.py[cod]
+*.pyo
 .ipynb_checkpoints/
-*.wav
-*.mp3
-data/
-models/
 
-# Sensitive Environment Configurations
+# ── Sensitive Environment Configuration ──────────────────────────────────────
 .env
 src/.env
+# Keep .env.example if you create one — it documents required keys safely
 
-# Local Databases
+# ── Local Databases ───────────────────────────────────────────────────────────
 *.db
 vocal_armor.db
 
-# Developer scratchpad / scripts
-src/test_db.py
+# ── Audio / Media Files ───────────────────────────────────────────────────────
+*.wav
+*.mp3
+*.flac
+*.ogg
+*.m4a
+*.aac
+*.opus
+dummy.mp3
 
-# Frontend dependencies and builds
+# ── Datasets & Model Binaries ─────────────────────────────────────────────────
+data/
+models/
+results/
+
+# ── Developer Scratchpad / Scripts ────────────────────────────────────────────
+src/test_db.py
+frontend/check_console.js
+
+# ── Frontend Dependencies & Builds ───────────────────────────────────────────
 node_modules/
 dist/
 frontend/node_modules/
 frontend/dist/
 
-# System / Editor configurations
+# ── System / Editor Configurations ───────────────────────────────────────────
 .DS_Store
 .vscode/
 .idea/
