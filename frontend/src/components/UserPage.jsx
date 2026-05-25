@@ -5,12 +5,14 @@ import { getPrefs, savePrefs, getHistory } from '../utils/storage';
 import Footer from './Footer';
 
 const UserPage = () => {
-  const { user } = useAuthStore();
+  const { user, accessToken, updateUser } = useAuthStore();
   
   const fullName = user?.full_name || user?.username || 'User';
   const nameParts = fullName.trim().split(' ');
   const first = nameParts[0] || '';
   const last = nameParts.length > 1 ? nameParts[nameParts.length - 1] : '';
+
+  const [avatarUploadLoading, setAvatarUploadLoading] = useState(false);
 
   const [editForm, setEditForm] = useState({
     firstName: first,
@@ -47,11 +49,61 @@ const UserPage = () => {
     setEditForm(prev => ({ ...prev, [name]: value }));
   };
 
-  const handleSave = () => {
+  const handleSave = async () => {
     setIsSaving(true);
-    // Persist preferences to this user's scoped storage
+    
+    // 1. Save preferences to local storage
     savePrefs({ strictFilter, autoSave, emailAlerts, phone: editForm.phone });
-    setTimeout(() => setIsSaving(false), 600);
+    
+    // 2. Save profile data to backend
+    try {
+      const res = await fetch('http://localhost:8000/users/me', {
+        method: 'PUT',
+        headers: {
+          'Content-Type': 'application/json',
+          'Authorization': `Bearer ${accessToken}`
+        },
+        body: JSON.stringify({
+          full_name: `${editForm.firstName} ${editForm.lastName}`.trim(),
+          email: editForm.email,
+          phone: editForm.phone
+        })
+      });
+      if (res.ok) {
+        const updatedUser = await res.json();
+        updateUser(updatedUser);
+      }
+    } catch (e) {
+      console.error("Failed to update profile", e);
+    }
+    
+    setIsSaving(false);
+  };
+
+  const handleAvatarUpload = async (e) => {
+    const file = e.target.files?.[0];
+    if (!file) return;
+
+    setAvatarUploadLoading(true);
+    const formData = new FormData();
+    formData.append('file', file);
+
+    try {
+      const res = await fetch('http://localhost:8000/users/me/avatar', {
+        method: 'POST',
+        headers: {
+          'Authorization': `Bearer ${accessToken}`
+        },
+        body: formData
+      });
+      if (res.ok) {
+        const updatedUser = await res.json();
+        updateUser(updatedUser);
+      }
+    } catch (err) {
+      console.error("Avatar upload failed", err);
+    }
+    setAvatarUploadLoading(false);
   };
 
   return (
@@ -76,15 +128,24 @@ const UserPage = () => {
         <div style={{ display: 'flex', flexDirection: 'column', gap: '24px' }}>
           
           <div style={{ background: '#0f2229', border: '1px solid rgba(255,255,255,0.08)', borderRadius: '20px', padding: '32px', display: 'flex', flexDirection: 'column', alignItems: 'center', textAlign: 'center' }}>
-            <div style={{ width: '120px', height: '120px', borderRadius: '50%', background: 'rgba(0, 212, 200, 0.1)', border: '2px solid rgba(0, 212, 200, 0.3)', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: '48px', color: '#00d4c8', marginBottom: '24px', boxShadow: '0 0 40px rgba(0,212,200,0.2)' }}>
-              <i className="ti ti-user-circle"></i>
-            </div>
-            <div style={{ fontSize: '24px', fontWeight: 600, color: 'white', marginBottom: '8px' }}>{fullName}</div>
-            <div style={{ color: '#7ea8a4', fontSize: '14px', marginBottom: '24px' }}>{user?.email || 'admin@vocalarmor.com'}</div>
             
-            <div style={{ background: 'rgba(232, 82, 30, 0.1)', color: '#e8521e', padding: '6px 16px', borderRadius: '100px', fontSize: '12px', fontWeight: 700, letterSpacing: '1px', border: '1px solid rgba(232, 82, 30, 0.3)' }}>
-              ENTERPRISE ADMIN
-            </div>
+            <label style={{ cursor: 'pointer', position: 'relative', display: 'block', marginBottom: '24px' }}>
+              <input type="file" accept="image/*" style={{ display: 'none' }} onChange={handleAvatarUpload} disabled={avatarUploadLoading} />
+              <div style={{ width: '120px', height: '120px', borderRadius: '50%', background: 'rgba(0, 212, 200, 0.1)', border: '2px solid rgba(0, 212, 200, 0.3)', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: '48px', color: '#00d4c8', boxShadow: '0 0 40px rgba(0,212,200,0.2)', overflow: 'hidden', position: 'relative' }}>
+                {user?.avatar_url ? (
+                  <img src={user.avatar_url} alt="Profile" style={{ width: '100%', height: '100%', objectFit: 'cover' }} />
+                ) : (
+                  <i className="ti ti-user-circle"></i>
+                )}
+                {/* Hover overlay */}
+                <div style={{ position: 'absolute', inset: 0, background: 'rgba(0,0,0,0.5)', display: 'flex', alignItems: 'center', justifyContent: 'center', opacity: avatarUploadLoading ? 1 : 0, transition: 'opacity 0.2s' }} className="avatar-overlay">
+                  {avatarUploadLoading ? <i className="ti ti-loader" style={{ animation: 'spin 1s linear infinite', color: '#00d4c8', fontSize: '24px' }}></i> : <i className="ti ti-camera" style={{ color: 'white', fontSize: '24px' }}></i>}
+                </div>
+              </div>
+            </label>
+
+            <div style={{ fontSize: '24px', fontWeight: 600, color: 'white', marginBottom: '8px' }}>{fullName}</div>
+            <div style={{ color: '#7ea8a4', fontSize: '14px' }}>{user?.email || 'admin@vocalarmor.com'}</div>
 
             <div style={{ width: '100%', height: '1px', background: 'rgba(255,255,255,0.1)', margin: '32px 0' }}></div>
 
@@ -213,6 +274,7 @@ const UserPage = () => {
       
       <style>{`
         @keyframes spin { 100% { transform: rotate(360deg); } }
+        label:hover .avatar-overlay { opacity: 1 !important; }
       `}</style>
     </div>
   );

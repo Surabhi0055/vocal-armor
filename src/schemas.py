@@ -9,11 +9,20 @@ class UserOut(BaseModel):
     email: str
     username: Optional[str]
     full_name: Optional[str]
-    avatar_url: Optional[str]
+    phone: Optional[str]
     is_google_user: bool
+    avatar_url: Optional[str]
+    is_active: bool
     created_at: datetime
 
-    model_config = {"from_attributes": True}
+    class Config:
+        from_attributes = True
+
+
+class UserUpdate(BaseModel):
+    full_name: Optional[str] = None
+    email: Optional[str] = None
+    phone: Optional[str] = None
 
 #  Auth request schemas 
 

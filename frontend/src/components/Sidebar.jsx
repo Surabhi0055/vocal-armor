@@ -1,10 +1,11 @@
 import React from 'react';
-import { NavLink } from 'react-router-dom';
+import { NavLink, useNavigate } from 'react-router-dom';
 import { useAuthStore } from '../store/authStore';
 import VAIcon from './VAIcon';
 
 const Sidebar = () => {
   const { user } = useAuthStore();
+  const navigate = useNavigate();
   
   const fullName = user?.full_name || 'Admin User';
   const email = user?.email || 'admin@vocalarmor.com';
@@ -55,13 +56,17 @@ const Sidebar = () => {
         {/* Profile Details Card */}
         <div style={{ width: '100%', overflow: 'hidden', padding: '16px 0 0 0', borderTop: '1px solid rgba(255,255,255,0.05)', display: 'flex', flexDirection: 'column', alignItems: 'center' }}>
           
-          <div style={{ display: 'flex', alignItems: 'center', gap: '12px', background: 'rgba(255,255,255,0.02)', border: '1px solid rgba(255,255,255,0.05)', padding: '6px', borderRadius: '30px', width: '90%', transition: 'all 0.3s', cursor: 'pointer' }}>
-            <div style={{ minWidth: '36px', height: '36px', borderRadius: '50%', background: 'linear-gradient(135deg, #00d4c8, #0088ff)', display: 'flex', alignItems: 'center', justifyContent: 'center', fontWeight: 800, fontSize: '14px', color: 'white', fontFamily: '"Bebas Neue", sans-serif', letterSpacing: '1px', boxShadow: '0 4px 10px rgba(0,0,0,0.3)' }}>
-              {initials}
-            </div>
-            <div className="side-text" style={{ margin: 0, display: 'flex', flexDirection: 'column' }}>
-              <span style={{ fontSize: '14px', fontWeight: 600, color: 'white' }}>{fullName}</span>
-              <span style={{ fontSize: '11px', color: 'var(--text-muted)' }}>{email}</span>
+          <div onClick={() => navigate('/user')} style={{ display: 'flex', alignItems: 'center', gap: '12px', background: 'rgba(255,255,255,0.02)', border: '1px solid rgba(255,255,255,0.05)', padding: '6px', borderRadius: '30px', width: '90%', transition: 'all 0.3s', cursor: 'pointer', overflow: 'hidden' }}>
+            {user?.avatar_url ? (
+              <img src={user.avatar_url} alt="Profile" style={{ minWidth: '36px', height: '36px', borderRadius: '50%', objectFit: 'cover', boxShadow: '0 4px 10px rgba(0,0,0,0.3)', flexShrink: 0 }} />
+            ) : (
+              <div style={{ minWidth: '36px', height: '36px', borderRadius: '50%', background: 'linear-gradient(135deg, #00d4c8, #0088ff)', display: 'flex', alignItems: 'center', justifyContent: 'center', fontWeight: 800, fontSize: '14px', color: 'white', fontFamily: '"Bebas Neue", sans-serif', letterSpacing: '1px', boxShadow: '0 4px 10px rgba(0,0,0,0.3)', flexShrink: 0 }}>
+                {initials}
+              </div>
+            )}
+            <div className="side-text" style={{ margin: 0, display: 'flex', flexDirection: 'column', overflow: 'hidden' }}>
+              <span style={{ fontSize: '14px', fontWeight: 600, color: 'white', whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>{fullName}</span>
+              <span style={{ fontSize: '11px', color: 'var(--text-muted)', whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>{email}</span>
             </div>
           </div>
           

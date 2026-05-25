@@ -84,6 +84,7 @@ export const useAuthStore = create(
             },
 
             clearError: () => set({ error: null }),
+            updateUser: (userData) => set({ user: { ...get().user, ...userData } }),
         }),
         {
             name: 'va_auth',

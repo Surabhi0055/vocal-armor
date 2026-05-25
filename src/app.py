@@ -5,9 +5,11 @@ load_dotenv(dotenv_path=Path(__file__).parent.parent / ".env")  # always load ro
 from fastapi import FastAPI, File, UploadFile, HTTPException, WebSocket, Form
 from fastapi.responses import JSONResponse
 from fastapi.middleware.cors import CORSMiddleware
+from fastapi.staticfiles import StaticFiles
 from starlette.middleware.sessions import SessionMiddleware
 from database import create_tables
 from routers.auth_router import router as auth_router
+from routers.user_router import router as user_router
 import uvicorn
 import os
 import tempfile
@@ -42,8 +44,13 @@ app.add_middleware(
     allow_headers=["*"],
 )
 
-# Mount the Authentication Router
+# Mount Routers
 app.include_router(auth_router)
+app.include_router(user_router)
+
+# Mount static files for uploads
+os.makedirs("uploads/avatars", exist_ok=True)
+app.mount("/uploads", StaticFiles(directory="uploads"), name="uploads")
 
 # Create tables on startup
 @app.on_event("startup")

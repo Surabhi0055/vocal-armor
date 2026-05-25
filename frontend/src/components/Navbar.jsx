@@ -245,9 +245,13 @@ const Navbar = () => {
               setShowNotifications(false);
             }}
           >
-            <div style={{ width: '30px', height: '30px', borderRadius: '50%', background: 'linear-gradient(135deg, #00d4c8, #0088ff)', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: '12px', fontWeight: 800, fontFamily: '"Bebas Neue", sans-serif' }}>
-              {initials}
-            </div>
+            {user?.avatar_url ? (
+              <img src={user.avatar_url} alt="Profile" style={{ width: '30px', height: '30px', borderRadius: '50%', objectFit: 'cover' }} />
+            ) : (
+              <div style={{ width: '30px', height: '30px', borderRadius: '50%', background: 'linear-gradient(135deg, #00d4c8, #0088ff)', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: '12px', fontWeight: 800, fontFamily: '"Bebas Neue", sans-serif' }}>
+                {initials}
+              </div>
+            )}
             <i className="ti ti-chevron-down" style={{ fontSize: '14px', color: '#7ea8a4' }}></i>
           </button>
 
