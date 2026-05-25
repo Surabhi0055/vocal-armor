@@ -1,13 +1,25 @@
 import React, { useState, useRef, useEffect } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import { useAuthStore } from '../store/authStore';
+import { getHistory } from '../utils/storage';
 import VAIcon from './VAIcon';
+
+const timeAgo = (dateStr) => {
+  const diff = Date.now() - new Date(dateStr).getTime();
+  const mins = Math.floor(diff / 60000);
+  if (mins < 1) return 'Just now';
+  if (mins < 60) return `${mins}m ago`;
+  const hrs = Math.floor(mins / 60);
+  if (hrs < 24) return `${hrs}h ago`;
+  return `${Math.floor(hrs / 24)}d ago`;
+};
 
 const Navbar = () => {
   const [isSearchActive, setIsSearchActive] = useState(false);
   const [searchValue, setSearchValue] = useState('');
   const [showNotifications, setShowNotifications] = useState(false);
   const [showProfileMenu, setShowProfileMenu] = useState(false);
+  const [notifications, setNotifications] = useState([]);
   
   const searchInputRef = useRef(null);
   
@@ -32,6 +44,22 @@ const Navbar = () => {
     return () => document.removeEventListener('mousedown', handleClickOutside);
   }, []);
 
+  // Load real notifications from history
+  const loadNotifications = () => {
+    const hist = getHistory();
+    // Get recent deepfake detections
+    const fakes = hist.filter(h => h.prediction === 'FAKE');
+    // Sort descending by timestamp
+    fakes.sort((a, b) => new Date(b.timestamp).getTime() - new Date(a.timestamp).getTime());
+    setNotifications(fakes.slice(0, 5)); // top 5
+  };
+
+  useEffect(() => {
+    loadNotifications();
+    window.addEventListener('va_history_updated', loadNotifications);
+    return () => window.removeEventListener('va_history_updated', loadNotifications);
+  }, []);
+
   const handleSearchClick = () => {
     setIsSearchActive(true);
     setTimeout(() => searchInputRef.current?.focus(), 100);
@@ -44,10 +72,16 @@ const Navbar = () => {
   };
 
   const executeSearch = (e) => {
-    if (e.key === 'Enter') {
-      console.log('Searching for:', searchValue);
-      alert(`Search feature triggered for: ${searchValue}`);
-      // In the future, this will link to filtering logic on the History or Batch page
+    if (e.key === 'Enter' && searchValue.trim()) {
+      navigate('/history', { state: { globalSearch: searchValue.trim() } });
+      setShowNotifications(false);
+      setShowProfileMenu(false);
+      setIsSearchActive(false);
+      setSearchValue('');
+      setTimeout(() => {
+        // Just unfocus the input so it shrinks back
+        searchInputRef.current?.blur();
+      }, 50);
     }
   };
 
@@ -141,21 +175,51 @@ const Navbar = () => {
             }}
           >
             <i className="ti ti-bell" style={{ fontSize: '20px' }}></i>
-            <div style={{ position: 'absolute', top: '8px', right: '10px', width: '8px', height: '8px', background: '#00d4c8', borderRadius: '50%', boxShadow: '0 0 10px rgba(0,212,200,0.8)' }}></div>
+            {notifications.length > 0 && (
+              <div style={{ position: 'absolute', top: '8px', right: '10px', width: '8px', height: '8px', background: '#00d4c8', borderRadius: '50%', boxShadow: '0 0 10px rgba(0,212,200,0.8)' }}></div>
+            )}
           </button>
           
           {showNotifications && (
             <div className="dropdown-menu" style={{ position: 'absolute', top: '50px', right: '0', width: '300px', background: '#0a191e', border: '1px solid rgba(255,255,255,0.1)', borderRadius: '12px', boxShadow: '0 10px 30px rgba(0,0,0,0.5)', zIndex: 100, overflow: 'hidden' }}>
-              <div style={{ padding: '16px', borderBottom: '1px solid rgba(255,255,255,0.05)', fontSize: '14px', fontWeight: 600, color: 'white' }}>Notifications</div>
-              <div style={{ padding: '16px', borderBottom: '1px solid rgba(255,255,255,0.05)', display: 'flex', gap: '12px' }}>
-                <div style={{ width: '8px', height: '8px', borderRadius: '50%', background: '#00d4c8', marginTop: '6px' }}></div>
-                <div>
-                  <div style={{ fontSize: '13px', color: 'white', marginBottom: '4px' }}>Batch Scan Complete</div>
-                  <div style={{ fontSize: '11px', color: '#7ea8a4' }}>10 files analyzed. 1 flagged as high-risk.</div>
-                  <div style={{ fontSize: '10px', color: 'rgba(255,255,255,0.3)', marginTop: '8px' }}>2 minutes ago</div>
-                </div>
+              <div style={{ padding: '16px', borderBottom: '1px solid rgba(255,255,255,0.05)', fontSize: '14px', fontWeight: 600, color: 'white', display: 'flex', justifyContent: 'space-between' }}>
+                <span>Notifications</span>
+                <span style={{ fontSize: '11px', background: 'rgba(0,212,200,0.1)', color: '#00d4c8', padding: '2px 8px', borderRadius: '100px' }}>{notifications.length} New</span>
               </div>
-              <div style={{ padding: '12px', textAlign: 'center', fontSize: '12px', color: '#00d4c8', cursor: 'pointer', background: 'rgba(0,212,200,0.05)' }}>Mark all as read</div>
+              
+              <div style={{ maxHeight: '300px', overflowY: 'auto' }}>
+                {notifications.length === 0 ? (
+                  <div style={{ padding: '30px 16px', textAlign: 'center', color: '#7ea8a4', fontSize: '13px' }}>
+                    <i className="ti ti-bell-off" style={{ fontSize: '24px', opacity: 0.5, marginBottom: '8px', display: 'block' }}></i>
+                    No recent deepfake alerts.
+                  </div>
+                ) : (
+                  notifications.map((notif, idx) => (
+                    <div key={idx} style={{ padding: '16px', borderBottom: '1px solid rgba(255,255,255,0.05)', display: 'flex', gap: '12px', background: 'rgba(232,82,30,0.05)' }}>
+                      <div style={{ width: '8px', height: '8px', borderRadius: '50%', background: '#e8521e', marginTop: '6px', flexShrink: 0, boxShadow: '0 0 8px rgba(232,82,30,0.6)' }}></div>
+                      <div style={{ overflow: 'hidden' }}>
+                        <div style={{ fontSize: '13px', color: 'white', marginBottom: '4px', display: 'flex', justifyContent: 'space-between' }}>
+                          <span style={{ fontWeight: 600 }}>Deepfake Detected</span>
+                          <span style={{ color: '#e8521e', fontWeight: 600 }}>{notif.confidence.toFixed(1)}%</span>
+                        </div>
+                        <div style={{ fontSize: '11px', color: '#7ea8a4', whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>
+                          {notif.filename}
+                        </div>
+                        <div style={{ fontSize: '10px', color: 'rgba(255,255,255,0.3)', marginTop: '8px' }}>{timeAgo(notif.timestamp)}</div>
+                      </div>
+                    </div>
+                  ))
+                )}
+              </div>
+              
+              {notifications.length > 0 && (
+                <div 
+                  style={{ padding: '12px', textAlign: 'center', fontSize: '12px', color: '#00d4c8', cursor: 'pointer', background: 'rgba(0,212,200,0.05)', borderTop: '1px solid rgba(0,212,200,0.1)' }}
+                  onClick={() => setNotifications([])}
+                >
+                  Clear all alerts
+                </div>
+              )}
             </div>
           )}
         </div>

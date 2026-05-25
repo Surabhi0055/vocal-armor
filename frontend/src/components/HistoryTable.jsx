@@ -1,9 +1,11 @@
 import React, { useState, useEffect, useMemo } from 'react';
+import { useLocation } from 'react-router-dom';
 import { getHistory, deleteAnalysis, clearHistory, exportCSV } from '../utils/storage';
 
 const HistoryTable = () => {
   const [history, setHistory] = useState([]);
   const [loading, setLoading] = useState(true);
+  const location = useLocation();
   
   // Filters
   const [verdictFilter, setVerdictFilter] = useState('All');
@@ -34,6 +36,14 @@ const HistoryTable = () => {
     window.addEventListener('va_history_updated', loadData);
     return () => window.removeEventListener('va_history_updated', loadData);
   }, []);
+
+  useEffect(() => {
+    if (location.state && location.state.globalSearch !== undefined) {
+      setSearch(location.state.globalSearch);
+      // Clear the state so a page refresh doesn't keep forcing the search
+      window.history.replaceState({}, document.title);
+    }
+  }, [location.state]);
 
   const filteredData = useMemo(() => {
     let data = [...history];
