@@ -18,7 +18,7 @@ Base = declarative_base()
 
 
 def create_tables():
-    from models import User, RefreshToken 
+    from models import User, RefreshToken, PasswordResetToken 
     Base.metadata.create_all(bind=engine)
 
 
@@ -31,11 +31,12 @@ def get_db():
 
 
 def _lazy_import():
-    from models import User, RefreshToken
-    return User, RefreshToken
+    from models import User, RefreshToken, PasswordResetToken
+    return User, RefreshToken, PasswordResetToken
 
 try:
-    from models import User, RefreshToken
+    from models import User, RefreshToken, PasswordResetToken
 except Exception:
     User = None
     RefreshToken = None
+    PasswordResetToken = None

@@ -1,6 +1,7 @@
-import React, { useState, useRef, useEffect } from 'react';
+import React, { useState, useRef } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useAuthStore } from '../store/authStore';
+import WaveformBackground from '../components/WaveformBackground';
 
 const EyeOpen = () => (
   <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round">
@@ -14,13 +15,7 @@ const EyeOff = () => (
   </svg>
 );
 
-const PALETTE = [
-  [255, 92,  43],
-  [  0, 212, 200],
-  [255, 138,  0],
-  [  0, 180, 255],
-  [232,  82,  30],
-];
+
 
 export default function AuthPage() {
   const navigate = useNavigate();
@@ -36,71 +31,11 @@ export default function AuthPage() {
   const [showPass,        setShowPass]        = useState(false);
   const [formError,       setFormError]       = useState('');
   const [forgotSent,      setForgotSent]      = useState(false);
+  const [oauthLoading,    setOauthLoading]    = useState(false);
 
-  const canvasRef = useRef(null);
-  const cardRef   = useRef(null);
-  const mouseRef  = useRef({ x: -9999, y: -9999 });
-  const tRef      = useRef(0);
-  const rafRef    = useRef(null);
+  const cardRef = useRef(null);
 
-  useEffect(() => {
-    const canvas = canvasRef.current;
-    if (!canvas) return;
-    const ctx = canvas.getContext('2d');
 
-    const resize = () => { canvas.width = window.innerWidth; canvas.height = window.innerHeight; };
-    resize();
-    window.addEventListener('resize', resize);
-    window.addEventListener('mousemove', e => { mouseRef.current = { x: e.clientX, y: e.clientY }; });
-
-    const drawCluster = (cx, cy, innerR, gap, count, t, colOffset) => {
-      const mdx    = mouseRef.current.x - cx;
-      const mdy    = mouseRef.current.y - cy;
-      const mDist  = Math.sqrt(mdx * mdx + mdy * mdy);
-      const mBoost = Math.max(0, 1 - mDist / 220) * 45;
-
-      for (let i = 0; i < count; i++) {
-        const baseR  = innerR + i * gap;
-        const expand = mBoost * (1 - i / count) * Math.sin(t * 0.04 - i * 0.3 + 1);
-        const R      = Math.max(1, baseR + expand);
-        const [r,g,b]= PALETTE[(i + colOffset) % PALETTE.length];
-        const alpha  = Math.max(0.05, 0.72 - i * (0.62 / count));
-        const lw     = Math.max(0.4, 1.9 - i * (1.3 / count));
-
-        ctx.beginPath();
-        ctx.arc(cx, cy, R, 0, Math.PI * 2);
-        ctx.strokeStyle = `rgba(${r},${g},${b},${alpha})`;
-        ctx.lineWidth   = lw;
-        ctx.shadowColor = `rgba(${r},${g},${b},${alpha * 0.55})`;
-        ctx.shadowBlur  = lw * 9;
-        ctx.stroke();
-        ctx.shadowBlur  = 0;
-      }
-    };
-
-    const draw = () => {
-      ctx.clearRect(0, 0, canvas.width, canvas.height);
-      const t = tRef.current;
-
-      let tlX = canvas.width * 0.22, tlY = canvas.height * 0.18;
-      let brX = canvas.width * 0.78, brY = canvas.height * 0.82;
-
-      if (cardRef.current) {
-        const rect = cardRef.current.getBoundingClientRect();
-        tlX = rect.left; tlY = rect.top;
-        brX = rect.right; brY = rect.bottom;
-      }
-
-      drawCluster(tlX, tlY, 8,  16, 16, t, 0);
-      drawCluster(brX, brY, 12, 20, 20, t, 1);
-
-      tRef.current++;
-      rafRef.current = requestAnimationFrame(draw);
-    };
-    draw();
-
-    return () => { window.removeEventListener('resize', resize); cancelAnimationFrame(rafRef.current); };
-  }, []);
 
   const handleLogin = async (e) => {
     e.preventDefault(); setFormError(''); clearError();
@@ -122,11 +57,25 @@ export default function AuthPage() {
     e.preventDefault(); setFormError('');
     if (!email) return setFormError('Please enter your email');
     try {
-      await fetch('http://localhost:8000/auth/forgot-password', {
-        method:'POST', headers:{'Content-Type':'application/json'}, body:JSON.stringify({email}),
+      const res = await fetch('http://localhost:8000/auth/forgot-password', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ email }),
       });
+      if (!res.ok) {
+        const data = await res.json().catch(() => ({}));
+        return setFormError(data?.detail || 'Something went wrong.');
+      }
       setForgotSent(true);
-    } catch { setFormError('Something went wrong.'); }
+    } catch {
+      setFormError('Network error. Please check your connection.');
+    }
+  };
+
+  const handleGoogleLogin = () => {
+    if (oauthLoading) return;
+    setOauthLoading(true);
+    window.location.href = 'http://localhost:8000/auth/google';
   };
 
   const switchMode = (m) => { setMode(m); setFormError(''); setForgotSent(false); clearError(); };
@@ -231,14 +180,22 @@ export default function AuthPage() {
         display:'flex', alignItems:'center', justifyContent:'center',
         fontFamily:'"Syne", sans-serif', overflow:'hidden', position:'relative' }}>
 
-        <canvas ref={canvasRef} style={{ position:'absolute', inset:0, width:'100%', height:'100%', pointerEvents:'none' }}/>
+        {/* Same waveform background as home & landing page */}
+        <WaveformBackground />
 
-        <div style={{ position:'absolute', left:'4%', top:'4%', width:'320px', height:'320px', borderRadius:'50%',
-          background:'radial-gradient(circle, rgba(255,92,43,0.22) 0%, transparent 65%)',
-          filter:'blur(40px)', pointerEvents:'none', zIndex:1 }}/>
-        <div style={{ position:'absolute', right:'4%', bottom:'4%', width:'420px', height:'420px', borderRadius:'50%',
-          background:'radial-gradient(circle, rgba(0,180,255,0.18) 0%, transparent 65%)',
-          filter:'blur(50px)', pointerEvents:'none', zIndex:1 }}/>
+        {/* Top gradient — cyan glow */}
+        <div style={{
+          position: 'absolute', top: 0, left: 0, right: 0, height: '260px',
+          background: 'linear-gradient(180deg, rgba(29,207,207,0.10) 0%, transparent 100%)',
+          pointerEvents: 'none', zIndex: 1,
+        }} />
+
+        {/* Bottom gradient — ember orange glow */}
+        <div style={{
+          position: 'absolute', bottom: 0, left: 0, right: 0, height: '220px',
+          background: 'linear-gradient(0deg, rgba(232,82,30,0.09) 0%, transparent 100%)',
+          pointerEvents: 'none', zIndex: 1,
+        }} />
 
         <div ref={cardRef} style={{
           position:'relative', zIndex:10,
@@ -267,10 +224,12 @@ export default function AuthPage() {
               {formError||error}
             </div>
           )}
-          {forgotSent && (
+          {/* FIX: success banner scoped inside forgot mode only to avoid
+              it showing up on the login form after returning from forgot */}
+          {forgotSent && mode === 'forgot' && (
             <div style={{ background:'rgba(0,212,200,0.07)', border:'1px solid rgba(0,212,200,0.22)',
               borderRadius:'10px', padding:'9px 13px', color:'#00d4c8', fontSize:'13px', marginBottom:'16px', backdropFilter:'blur(5px)' }}>
-              ✓ Reset link sent! Check your inbox.
+              ✓ If that email is registered, a reset link has been sent.
             </div>
           )}
 
@@ -296,8 +255,25 @@ export default function AuthPage() {
                 </div>
               </div>
               <div style={{ display:'flex', justifyContent:'space-between', alignItems:'center' }}>
-                <label style={{ display:'flex', alignItems:'center', gap:'7px', cursor:'pointer', fontSize:'12px', color:'#7ea8a4' }}>
-                  <input type="checkbox" checked={rememberMe} onChange={e=>setRememberMe(e.target.checked)} style={{ accentColor:'#00d4c8' }}/>
+                {/* FIX: use a toggle function — clicking the label sets e.target to the <label>
+                    element (not the checkbox), making e.target.checked undefined. */}
+                <label
+                  style={{ display:'flex', alignItems:'center', gap:'7px', cursor:'pointer', fontSize:'12px', color:'#7ea8a4', userSelect:'none' }}
+                  onClick={(e) => { e.preventDefault(); setRememberMe(v => !v); }}
+                >
+                  <div style={{
+                    width: '16px', height: '16px', borderRadius: '4px', flexShrink: 0,
+                    border: `1.5px solid ${rememberMe ? '#1dcfcf' : 'rgba(255,255,255,0.3)'}`,
+                    background: rememberMe ? 'rgba(29,207,207,0.2)' : 'transparent',
+                    display: 'flex', alignItems: 'center', justifyContent: 'center',
+                    transition: 'all 0.2s',
+                  }}>
+                    {rememberMe && (
+                      <svg width="10" height="10" viewBox="0 0 10 10" fill="none">
+                        <path d="M1.5 5L4 7.5L8.5 2.5" stroke="#1dcfcf" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round"/>
+                      </svg>
+                    )}
+                  </div>
                   Remember me
                 </label>
                 <button type="button" onClick={()=>switchMode('forgot')}
@@ -315,11 +291,13 @@ export default function AuthPage() {
                 or continue with
                 <span style={{ flex:1, height:'1px', background:'rgba(255,255,255,0.1)'}}/>
               </div>
-              <button type="button" style={googleBtn}
-                onClick={()=>window.location.href='http://localhost:8000/auth/google'}
-                onMouseOver={e => e.currentTarget.style.background = 'rgba(255,255,255,0.1)'}
+              <button type="button"
+                style={{ ...googleBtn, opacity: oauthLoading ? 0.65 : 1 }}
+                onClick={handleGoogleLogin}
+                disabled={oauthLoading}
+                onMouseOver={e => { if (!oauthLoading) e.currentTarget.style.background = 'rgba(255,255,255,0.1)'; }}
                 onMouseOut={e => e.currentTarget.style.background = 'rgba(255,255,255,0.05)'}>
-                <GoogleSVG/> Continue with Google
+                <GoogleSVG/> {oauthLoading ? 'Redirecting…' : 'Continue with Google'}
               </button>
             </form>
           )}
@@ -370,11 +348,13 @@ export default function AuthPage() {
                 <span style={{ flex:1, height:'1px', background:'rgba(255,255,255,0.1)'}}/>or
                 <span style={{ flex:1, height:'1px', background:'rgba(255,255,255,0.1)'}}/>
               </div>
-              <button type="button" style={googleBtn}
-                onClick={()=>window.location.href='http://localhost:8000/auth/google'}
-                onMouseOver={e => e.currentTarget.style.background = 'rgba(255,255,255,0.1)'}
+              <button type="button"
+                style={{ ...googleBtn, opacity: oauthLoading ? 0.65 : 1 }}
+                onClick={handleGoogleLogin}
+                disabled={oauthLoading}
+                onMouseOver={e => { if (!oauthLoading) e.currentTarget.style.background = 'rgba(255,255,255,0.1)'; }}
                 onMouseOut={e => e.currentTarget.style.background = 'rgba(255,255,255,0.05)'}>
-                <GoogleSVG/> Sign up with Google
+                <GoogleSVG/> {oauthLoading ? 'Redirecting…' : 'Sign up with Google'}
               </button>
             </form>
           )}

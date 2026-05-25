@@ -4,6 +4,7 @@ import { useAuthStore } from './store/authStore';
 import AuthPage from './pages/AuthPage';
 import AuthCallback from './pages/AuthCallback';
 import LandingPage from './pages/LandingPage';
+import ResetPasswordPage from './pages/ResetPasswordPage';
 import ProtectedRoute from './components/ProtectedRoute';
 
 // Existing layout core components
@@ -56,6 +57,7 @@ function App() {
         <Route path="/start" element={<LandingPage />} />
         <Route path="/login" element={<AuthPage />} />
         <Route path="/auth/callback" element={<AuthCallback />} />
+        <Route path="/reset-password" element={<ResetPasswordPage />} />
         
         {/* Secure dashboard workspace gating */}
         <Route path="/*" element={
