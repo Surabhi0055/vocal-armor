@@ -111,7 +111,8 @@ const BatchUploadPage = () => {
         });
 
         if (!response.ok) {
-          throw new Error('Analysis failed');
+          const errorData = await response.json().catch(() => ({}));
+          throw new Error(errorData.detail || errorData.error || 'Analysis failed');
         }
 
         const data = await response.json();

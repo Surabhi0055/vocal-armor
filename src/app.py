@@ -1,8 +1,11 @@
 from dotenv import load_dotenv
 from pathlib import Path
-load_dotenv(dotenv_path=Path(__file__).parent.parent / ".env")  # always load root .env
+load_dotenv(dotenv_path=Path(__file__).parent.parent / ".env")
 
-from fastapi import FastAPI, File, UploadFile, HTTPException, WebSocket, Form
+from fastapi import FastAPI, File, UploadFile, HTTPException, WebSocket, Form, Request
+from slowapi import Limiter, _rate_limit_exceeded_handler
+from slowapi.util import get_remote_address
+from slowapi.errors import RateLimitExceeded
 from fastapi.responses import JSONResponse
 from fastapi.middleware.cors import CORSMiddleware
 from fastapi.staticfiles import StaticFiles
@@ -25,6 +28,12 @@ app = FastAPI(
     ),
     version="1.2",
 )
+# rate limiter to track users by their IP address
+limiter = Limiter(key_func=get_remote_address)
+app.state.limiter = limiter
+
+# handle users who break the rules
+app.add_exception_handler(RateLimitExceeded, _rate_limit_exceeded_handler)
 
 # Enable sessions (for Google OAuth callback states)
 app.add_middleware(SessionMiddleware, secret_key=os.getenv("SECRET_KEY", "change-me"))
@@ -98,7 +107,8 @@ def get_supported_formats():
 
 
 @app.post("/predict", tags=["Detection"])
-async def predict_audio(file: UploadFile = File(...), model: str = Form("best")):
+@limiter.limit("100/minute")  
+async def predict_audio(request: Request, file: UploadFile = File(...), model: str = Form("best")):
 
     # 1. Validate file extension
     ext = Path(file.filename).suffix.lower()
@@ -134,6 +144,8 @@ async def predict_audio(file: UploadFile = File(...), model: str = Form("best"))
         raise HTTPException(status_code=400, detail=str(ve))
 
     except Exception as e:
+        import traceback
+        traceback.print_exc()
         raise HTTPException(
             status_code=500,
             detail=f"Prediction failed: {str(e)}",
@@ -160,7 +172,8 @@ async def predict_audio(file: UploadFile = File(...), model: str = Form("best"))
     })
 
 @app.post("/predict-url", tags=["Detection"])
-async def predict_from_url(url: str, model: str = "best"):
+@limiter.limit("5/minute") 
+async def predict_from_url(request: Request,url: str, model: str = "best"):
     
     import yt_dlp
     import re
