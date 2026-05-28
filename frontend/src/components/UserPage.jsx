@@ -107,7 +107,7 @@ const UserPage = () => {
   };
 
   return (
-    <div style={{ padding: '40px', maxWidth: '1000px', margin: '0 auto', width: '100%', zIndex: 2, position: 'relative' }}>
+    <div className="dashboard" style={{ paddingBottom: '100px' }}>
       
       <div style={{ marginBottom: '40px', display: 'flex', justifyContent: 'space-between', alignItems: 'flex-end' }}>
         <div>

@@ -19,9 +19,9 @@ const ModelSelector = ({ selectedModel, onModelChange }) => {
           fontFamily: 'inherit'
         }}
       >
-        <option value="best" style={{ background: '#0f2229' }}>vocal_armor_best (Standard Dataset)</option>
+        <option value="best" style={{ background: '#0f2229' }}>vocal_armor_best (Standard)</option>
         <option value="v2" style={{ background: '#0f2229' }}>vocal_armor_v2 (Intermediate)</option>
-        <option value="v3" style={{ background: '#0f2229' }}>vocal_armor_v3 (ElevenLabs/Modern TTS)</option>
+        <option value="v3" style={{ background: '#0f2229' }}>vocal_armor_v3 (Modern Deepfake Voice)</option>
       </select>
     </div>
   );

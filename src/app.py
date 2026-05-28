@@ -164,6 +164,7 @@ async def predict_audio(request: Request, file: UploadFile = File(...), model: s
         "confidence":  result["confidence"],
         "raw_score":   result["raw_score"],
         "is_deepfake": is_fake,
+        "heatmap":     result.get("heatmap"),
         "message": (
             f"AI-generated voice detected with {result['confidence']}% confidence."
             if is_fake else
@@ -224,6 +225,7 @@ async def predict_from_url(request: Request,url: str, model: str = "best"):
         "confidence":  result["confidence"],
         "raw_score":   result["raw_score"],
         "is_deepfake": is_fake,
+        "heatmap":     result.get("heatmap"),
         "message": (
             f"AI-generated voice detected with {result['confidence']}% confidence."
             if is_fake else

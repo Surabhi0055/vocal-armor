@@ -296,7 +296,7 @@ const LiveMonitorPage = () => {
     : '0 0 32px rgba(0,212,200,0.5)';
 
   return (
-    <div style={{ padding: '40px', maxWidth: '1000px', margin: '0 auto', width: '100%', zIndex: 2, position: 'relative', paddingBottom: '100px' }}>
+    <div className="dashboard" style={{ paddingBottom: '100px' }}>
 
       {/* Page Header */}
       <div style={{ marginBottom: '40px' }}>
@@ -426,11 +426,11 @@ const LiveMonitorPage = () => {
 
       {/* Result Card */}
       {status === 'done' && result && (
-        <div style={{ background: '#0f2229', border: `1px solid ${result.is_deepfake ? 'rgba(232,82,30,0.3)' : 'rgba(0,212,200,0.3)'}`, borderRadius: '20px', padding: '32px', marginBottom: '24px', display: 'flex', alignItems: 'center', gap: '28px', boxShadow: verdictGlow }}>
+        <div style={{ background: '#0f2229', border: `1px solid ${result.is_deepfake ? 'rgba(232,82,30,0.3)' : 'rgba(0,212,200,0.3)'}`, borderRadius: '20px', padding: '32px', marginBottom: '24px', display: 'flex', flexWrap: 'wrap', alignItems: 'center', gap: '28px', boxShadow: verdictGlow }}>
           <div style={{ width: '64px', height: '64px', borderRadius: '50%', background: result.is_deepfake ? 'rgba(232,82,30,0.12)' : 'rgba(0,212,200,0.12)', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: '28px', color: verdictColor, flexShrink: 0 }}>
             <i className={result.is_deepfake ? 'ti ti-alert-triangle' : 'ti ti-shield-check'}></i>
           </div>
-          <div style={{ flex: 1 }}>
+          <div style={{ flex: 1, minWidth: '300px' }}>
             <div style={{ fontSize: '10px', letterSpacing: '2px', color: '#7ea8a4', marginBottom: '6px' }}>LATEST ANALYSIS</div>
             <div style={{ fontSize: '28px', fontWeight: 800, color: verdictColor, letterSpacing: '2px', marginBottom: '4px', textShadow: verdictGlow }}>
               {result.is_deepfake ? '⚠ AI DEEPFAKE DETECTED' : '✓ HUMAN VOICE VERIFIED'}
@@ -448,6 +448,60 @@ const LiveMonitorPage = () => {
             </div>
             <div style={{ fontSize: '10px', color: '#7ea8a4', marginTop: '6px', letterSpacing: '1px' }}>CONFIDENCE</div>
           </div>
+
+          {result.heatmap && (
+            <div
+              style={{
+                width: "100%",
+                marginTop: "16px",
+                paddingTop: "16px",
+                borderTop: "1px solid rgba(255,255,255,0.1)",
+                animation: "fadeIn 0.5s ease-out",
+              }}
+            >
+              <div
+                style={{
+                  fontSize: "12px",
+                  color: "#7ea8a4",
+                  marginBottom: "16px",
+                  textTransform: "uppercase",
+                  letterSpacing: "1px",
+                  textAlign: "center",
+                  fontWeight: 600
+                }}
+              >
+                CNN ACTIVATION HEATMAP
+              </div>
+              <div style={{ display: "flex", justifyContent: "center" }}>
+                <img
+                  src={result.heatmap}
+                  alt="Neural Attention Heatmap"
+                  style={{
+                    width: "100%",
+                    maxWidth: "280px",
+                    borderRadius: "12px",
+                    border: "1px solid rgba(255,255,255,0.1)",
+                    objectFit: "contain",
+                    boxShadow: "0 8px 32px rgba(0,0,0,0.4)"
+                  }}
+                />
+              </div>
+              <p
+                style={{
+                  fontSize: "12px",
+                  color: "rgba(255,255,255,0.6)",
+                  marginTop: "16px",
+                  lineHeight: 1.5,
+                  textAlign: "center",
+                  maxWidth: "400px",
+                  margin: "16px auto 0"
+                }}
+              >
+                The <span style={{ color: "#e8521e", fontWeight: "bold" }}>warm regions</span>{" "}
+                highlight the specific audio frequencies that triggered the AI's detection model.
+              </p>
+            </div>
+          )}
         </div>
       )}
 

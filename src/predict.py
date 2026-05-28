@@ -113,6 +113,79 @@ def preprocess_audio(audio_path, model_name="best"):
 
     return final
 
+def get_base64_heatmap(img_array, heatmap):
+    import base64
+    from io import BytesIO
+    import matplotlib.cm as cm
+    from PIL import Image
+
+    #Rescale the raw heatmap math into image pixels (0-255)
+    heatmap = np.uint8(255 * heatmap)
+    
+    #Apply a "Jet" colormap (turns it into red/yellow/blue)
+    jet = cm.get_cmap("jet")
+    jet_colors = jet(np.arange(256))[:, :3]
+    jet_heatmap = jet_colors[heatmap] * 255
+    
+    #Resize the heatmap so it matches the original spectrogram size
+    original_img_shape = (img_array.shape[2], img_array.shape[1]) 
+    jet_img = Image.fromarray(np.uint8(jet_heatmap))
+    jet_img = jet_img.resize(original_img_shape, Image.LANCZOS)
+    jet_array = np.array(jet_img)
+    
+    #Superimpose the glowing heatmap on top of the original spectrogram
+    original_array = np.uint8(img_array[0] * 255)
+    superimposed_array = np.uint8(jet_array * 0.4 + original_array * 0.6)
+    
+    #Convert the image into a Base64 string so we can send it over the internet to React!
+    final_img = Image.fromarray(superimposed_array)
+    buffered = BytesIO()
+    final_img.save(buffered, format="JPEG")
+    base64_str = base64.b64encode(buffered.getvalue()).decode('utf-8')
+    
+    return f"data:image/jpeg;base64,{base64_str}"
+
+def make_gradcam_heatmap(img_array, model):
+    # Dynamically find the last Convolutional layer in your model
+    last_conv_layer_name = None
+    for layer in reversed(model.layers):
+        if isinstance(layer, tf.keras.layers.Conv2D):
+            last_conv_layer_name = layer.name
+            break
+            
+    if not last_conv_layer_name: return None
+        
+    # Manual forward pass to ensure Keras 3 computes gradients correctly
+    img_tensor = tf.convert_to_tensor(img_array)
+    with tf.GradientTape() as tape:
+        tape.watch(img_tensor)
+        x = img_tensor
+        last_conv_layer_output = None
+        for layer in model.layers:
+            x = layer(x)
+            if layer.name == last_conv_layer_name:
+                last_conv_layer_output = x
+        preds = x
+        class_channel = preds[:, 0]
+        
+    grads = tape.gradient(class_channel, last_conv_layer_output)
+    if grads is None: return None
+    
+    pooled_grads = tf.reduce_mean(grads, axis=(0, 1, 2))
+    
+    #Multiply feature maps by "importance" (gradients)
+    last_conv_layer_output = last_conv_layer_output[0]
+    heatmap = last_conv_layer_output @ pooled_grads[..., tf.newaxis]
+    heatmap = tf.squeeze(heatmap)
+    
+    #Normalize between 0 and 1
+    heatmap = tf.maximum(heatmap, 0) / tf.math.reduce_max(heatmap)
+    heatmap_numpy = heatmap.numpy()
+    
+    if np.isnan(heatmap_numpy).any():
+        return np.zeros(heatmap_numpy.shape)
+        
+    return heatmap_numpy
 
 def validate_audio_file(audio_path: str):
     """Raise ValueError if the file extension is not a supported audio format."""
@@ -150,11 +223,18 @@ def predict_voice(audio_path: str, model, model_name: str = "best") -> dict:
         confidence = 50 + ((THRESHOLD - score) / THRESHOLD) * 50 if THRESHOLD != 0.5 else (1.0 - score) * 100
         label      = "FAKE"
         print(f"RESULT: AI DEEPFAKE DETECTED (Confidence: {confidence:.2f}%)")
-
+    try:
+        print("Generating Grad-CAM Heatmap...")
+        heatmap_data = make_gradcam_heatmap(img_array, model)
+        heatmap_base64 = get_base64_heatmap(img_array, heatmap_data) if heatmap_data is not None else None
+    except Exception as e:
+        print(f"Failed to generate Grad-CAM: {e}")
+        heatmap_base64 = None
     return {
         "prediction": label,
         "confidence": round(confidence, 2),
         "raw_score":  round(score, 4),
+        "heatmap": heatmap_base64
     }
 
 

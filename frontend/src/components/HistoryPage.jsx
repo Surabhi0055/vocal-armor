@@ -67,7 +67,7 @@ const HistoryPage = () => {
   }, [loadQuickStats]);
 
   return (
-    <div style={{ padding: '40px', maxWidth: '1100px', margin: '0 auto', width: '100%', position: 'relative', zIndex: 2, paddingBottom: '100px' }}>
+    <div className="dashboard" style={{ paddingBottom: '100px' }}>
 
       {/* Page Header */}
       <div style={{ marginBottom: '40px' }}>

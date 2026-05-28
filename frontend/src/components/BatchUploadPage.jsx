@@ -148,7 +148,7 @@ const BatchUploadPage = () => {
   const errorCount = results.filter(r => r.error).length;
 
   return (
-    <div style={{ padding: '40px', maxWidth: '1000px', margin: '0 auto', width: '100%', zIndex: 2, position: 'relative', paddingBottom: '100px' }}>
+    <div className="dashboard" style={{ paddingBottom: '100px' }}>
       
       <div style={{ marginBottom: '40px' }}>
         <h1 style={{ fontFamily: '"Bebas Neue", sans-serif', fontSize: '48px', fontWeight: 400, letterSpacing: '2px', lineHeight: 1, marginBottom: '12px', textTransform: 'uppercase' }}>
