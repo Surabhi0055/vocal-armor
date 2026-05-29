@@ -150,14 +150,7 @@ const BatchUploadPage = () => {
   return (
     <div className="dashboard" style={{ paddingBottom: '100px' }}>
       
-      <div style={{ marginBottom: '40px' }}>
-        <h1 style={{ fontFamily: '"Bebas Neue", sans-serif', fontSize: '48px', fontWeight: 400, letterSpacing: '2px', lineHeight: 1, marginBottom: '12px', textTransform: 'uppercase' }}>
-          BATCH <span style={{ color: '#00d4c8', textShadow: '0 0 40px rgba(0,212,200,0.4)' }}>ANALYSIS</span>
-        </h1>
-        <p style={{ fontSize: '14px', color: '#7ea8a4', lineHeight: 1.6 }}>
-          Upload multiple audio files to analyze them sequentially.
-        </p>
-      </div>
+
 
       <ModelSelector selectedModel={selectedModel} onModelChange={setSelectedModel} />
 
@@ -194,21 +187,21 @@ const BatchUploadPage = () => {
       )}
 
       {files.length > 0 && status === 'idle' && (
-        <div style={{ background: '#0f2229', border: '1px solid rgba(255,255,255,0.08)', borderRadius: '20px', padding: '32px', marginBottom: '24px' }}>
+        <div style={{ background: 'var(--bg-card)', border: '1px solid rgba(232,220,200,0.08)', borderRadius: '20px', padding: '32px', marginBottom: '24px' }}>
           <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '20px' }}>
             <div style={{ fontSize: '16px', fontWeight: 600 }}>{files.length} Files Queued</div>
             <button 
-              onClick={startBatchAnalysis}
-              style={{ background: '#00d4c8', color: '#0f2229', border: 'none', borderRadius: '8px', padding: '12px 24px', cursor: 'pointer', fontWeight: 700, letterSpacing: '1px', boxShadow: '0 4px 16px rgba(0,212,200,0.3)' }}>
+              className="btn-primary"
+              onClick={startBatchAnalysis}>
               START BATCH ANALYSIS
             </button>
           </div>
           
           <div style={{ display: 'flex', flexDirection: 'column', gap: '8px', maxHeight: '300px', overflowY: 'auto' }}>
             {files.map((f, i) => (
-              <div key={i} style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', background: 'rgba(255,255,255,0.03)', padding: '12px 16px', borderRadius: '8px' }}>
+              <div key={i} style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', background: 'rgba(232,220,200,0.03)', padding: '12px 16px', borderRadius: '8px' }}>
                 <span style={{ fontSize: '14px' }}>{f.name}</span>
-                <i className="ti ti-x" style={{ cursor: 'pointer', color: '#7ea8a4' }} onClick={() => removeFile(i)}></i>
+                <i className="ti ti-x" style={{ cursor: 'pointer', color: 'var(--text-muted)' }} onClick={() => removeFile(i)}></i>
               </div>
             ))}
           </div>
@@ -216,13 +209,13 @@ const BatchUploadPage = () => {
       )}
 
       {status === 'analyzing' && (
-        <div style={{ background: '#0f2229', border: '1px solid rgba(0,212,200,0.3)', borderRadius: '20px', padding: '40px', textAlign: 'center', boxShadow: '0 0 30px rgba(0,212,200,0.1)' }}>
-          <i className="ti ti-loader ti-spin" style={{ fontSize: '48px', color: '#00d4c8', marginBottom: '20px', display: 'block' }}></i>
+        <div style={{ background: 'var(--bg-card)', border: '1px solid rgba(123,157,174,0.3)', borderRadius: '20px', padding: '40px', textAlign: 'center', boxShadow: '0 0 30px rgba(123,157,174,0.1)' }}>
+          <i className="ti ti-loader ti-spin" style={{ fontSize: '48px', color: '#C6A75E', marginBottom: '20px', display: 'block' }}></i>
           <div style={{ fontSize: '24px', fontWeight: 600, marginBottom: '12px' }}>Analyzing Batch...</div>
-          <div style={{ fontSize: '16px', color: '#7ea8a4', marginBottom: '24px' }}>Processing file {progress} of {files.length}</div>
+          <div style={{ fontSize: '16px', color: 'var(--text-muted)', marginBottom: '24px' }}>Processing file {progress} of {files.length}</div>
           
-          <div style={{ height: '8px', background: 'rgba(255,255,255,0.1)', borderRadius: '4px', overflow: 'hidden' }}>
-            <div style={{ width: `${(progress / files.length) * 100}%`, height: '100%', background: '#00d4c8', transition: 'width 0.3s' }}></div>
+          <div style={{ height: '8px', background: 'rgba(232,220,200,0.1)', borderRadius: '4px', overflow: 'hidden' }}>
+            <div style={{ width: `${(progress / files.length) * 100}%`, height: '100%', background: '#C6A75E', transition: 'width 0.3s' }}></div>
           </div>
         </div>
       )}
@@ -230,35 +223,35 @@ const BatchUploadPage = () => {
       {status === 'done' && (
         <>
           <div style={{ display: 'flex', gap: '24px', marginBottom: '24px' }}>
-            <div style={{ flex: 1, background: '#0f2229', border: '1px solid rgba(232,82,30,0.3)', borderRadius: '20px', padding: '32px', textAlign: 'center' }}>
-              <div style={{ fontSize: '48px', fontWeight: 800, color: '#e8521e', marginBottom: '8px' }}>{fakeCount}</div>
-              <div style={{ fontSize: '12px', letterSpacing: '2px', color: '#7ea8a4' }}>AI DEEPFAKE</div>
+            <div style={{ flex: 1, background: 'var(--bg-card)', border: '1px solid rgba(122,46,50,0.3)', borderRadius: '20px', padding: '32px', textAlign: 'center' }}>
+              <div style={{ fontSize: '48px', fontWeight: 800, color: '#A63A3F', marginBottom: '8px' }}>{fakeCount}</div>
+              <div style={{ fontSize: '12px', letterSpacing: '2px', color: 'var(--text-muted)' }}>AI DEEPFAKE</div>
             </div>
-            <div style={{ flex: 1, background: '#0f2229', border: '1px solid rgba(0,212,200,0.3)', borderRadius: '20px', padding: '32px', textAlign: 'center' }}>
-              <div style={{ fontSize: '48px', fontWeight: 800, color: '#00d4c8', marginBottom: '8px' }}>{realCount}</div>
-              <div style={{ fontSize: '12px', letterSpacing: '2px', color: '#7ea8a4' }}>HUMAN VOICE</div>
+            <div style={{ flex: 1, background: 'var(--bg-card)', border: '1px solid rgba(123,157,174,0.3)', borderRadius: '20px', padding: '32px', textAlign: 'center' }}>
+              <div style={{ fontSize: '48px', fontWeight: 800, color: '#C6A75E', marginBottom: '8px' }}>{realCount}</div>
+              <div style={{ fontSize: '12px', letterSpacing: '2px', color: 'var(--text-muted)' }}>HUMAN VOICE</div>
             </div>
           </div>
 
-          <div style={{ background: '#0f2229', border: '1px solid rgba(255,255,255,0.08)', borderRadius: '20px', padding: '32px' }}>
+          <div style={{ background: 'var(--bg-card)', border: '1px solid rgba(232,220,200,0.08)', borderRadius: '20px', padding: '32px' }}>
             <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '24px' }}>
               <div style={{ fontSize: '18px', fontWeight: 600 }}>Batch Results</div>
               <button 
                 onClick={clearBatch}
-                style={{ background: 'transparent', color: '#7ea8a4', border: '1px solid rgba(255,255,255,0.2)', borderRadius: '8px', padding: '8px 16px', cursor: 'pointer', fontSize: '12px', letterSpacing: '1px' }}>
+                style={{ background: 'transparent', color: 'var(--text-muted)', border: '1px solid rgba(232,220,200,0.2)', borderRadius: '8px', padding: '8px 16px', cursor: 'pointer', fontSize: '12px', letterSpacing: '1px' }}>
                 NEW BATCH
               </button>
             </div>
 
             <div style={{ display: 'flex', flexDirection: 'column', gap: '8px' }}>
               {results.map((r, i) => (
-                <div key={i} style={{ display: 'flex', alignItems: 'center', background: 'rgba(255,255,255,0.03)', padding: '16px', borderRadius: '12px', gap: '16px' }}>
+                <div key={i} style={{ display: 'flex', alignItems: 'center', background: 'rgba(232,220,200,0.03)', padding: '16px', borderRadius: '12px', gap: '16px' }}>
                   <div style={{ flex: 1, fontSize: '14px' }}>{r.filename}</div>
                   {r.error ? (
-                    <div style={{ color: '#e8521e', fontSize: '13px' }}>Error: {r.message}</div>
+                    <div style={{ color: '#A63A3F', fontSize: '13px' }}>Error: {r.message}</div>
                   ) : (
                     <>
-                      <div style={{ padding: '4px 12px', borderRadius: '100px', fontSize: '11px', fontWeight: 700, letterSpacing: '1px', background: r.is_deepfake ? 'rgba(232,82,30,0.15)' : 'rgba(0,212,200,0.15)', color: r.is_deepfake ? '#e8521e' : '#00d4c8' }}>
+                      <div style={{ padding: '4px 12px', borderRadius: '100px', fontSize: '11px', fontWeight: 700, letterSpacing: '1px', background: r.is_deepfake ? 'rgba(122,46,50,0.15)' : 'rgba(123,157,174,0.15)', color: r.is_deepfake ? '#A63A3F' : '#C6A75E' }}>
                         {r.prediction}
                       </div>
                       <div style={{ fontWeight: 600, width: '60px', textAlign: 'right' }}>

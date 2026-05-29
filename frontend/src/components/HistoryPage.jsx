@@ -14,7 +14,7 @@ class ErrorBoundary extends React.Component {
   render() {
     if (this.state.hasError) {
       return (
-        <div style={{ padding: 24, background: 'rgba(232,82,30,0.1)', border: '1px solid rgba(232,82,30,0.3)', borderRadius: 12, color: '#e8521e', marginBottom: 24 }}>
+        <div style={{ padding: 24, background: 'rgba(122,46,50,0.1)', border: '1px solid rgba(122,46,50,0.3)', borderRadius: 12, color: '#A63A3F', marginBottom: 24 }}>
           <strong>Component Error:</strong> {this.state.error?.message}
         </div>
       );
@@ -69,21 +69,12 @@ const HistoryPage = () => {
   return (
     <div className="dashboard" style={{ paddingBottom: '100px' }}>
 
-      {/* Page Header */}
-      <div style={{ marginBottom: '40px' }}>
 
-        <h1 style={{ fontFamily: '"Bebas Neue", sans-serif', fontSize: '48px', fontWeight: 400, letterSpacing: '2px', lineHeight: 1, marginBottom: '12px', textTransform: 'uppercase' }}>
-          SESSION <span style={{ color: '#00d4c8', textShadow: '0 0 40px rgba(0,212,200,0.4)' }}>ANALYTICS</span>
-        </h1>
-        <p style={{ fontSize: '14px', color: '#7ea8a4', lineHeight: 1.6 }}>
-          Comprehensive history and deepfake threat intelligence data from your analysis sessions.
-        </p>
-      </div>
 
       {/* FakeRateChart */}
       <ErrorBoundary>
         <React.Suspense fallback={
-          <div style={{ height: 300, background: 'rgba(255,255,255,0.02)', borderRadius: 16, marginBottom: 40, display: 'flex', alignItems: 'center', justifyContent: 'center', color: '#7ea8a4' }}>
+          <div style={{ height: 300, background: 'rgba(232,220,200,0.02)', borderRadius: 16, marginBottom: 40, display: 'flex', alignItems: 'center', justifyContent: 'center', color: 'var(--text-muted)' }}>
             Loading chart...
           </div>
         }>
@@ -96,7 +87,7 @@ const HistoryPage = () => {
 
         <ErrorBoundary>
           <React.Suspense fallback={
-            <div style={{ height: 300, background: 'rgba(255,255,255,0.02)', borderRadius: 16, display: 'flex', alignItems: 'center', justifyContent: 'center', color: '#7ea8a4' }}>
+            <div style={{ height: 300, background: 'rgba(232,220,200,0.02)', borderRadius: 16, display: 'flex', alignItems: 'center', justifyContent: 'center', color: 'var(--text-muted)' }}>
               Loading chart...
             </div>
           }>
@@ -105,47 +96,47 @@ const HistoryPage = () => {
         </ErrorBoundary>
 
         {/* Quick Stats Panel */}
-        <div style={{ background: '#0f2229', border: '1px solid rgba(255,255,255,0.08)', borderRadius: '16px', padding: '24px', backdropFilter: 'blur(16px)', display: 'flex', flexDirection: 'column', gap: '16px' }}>
+        <div style={{ background: 'var(--bg-card)', border: '1px solid rgba(232,220,200,0.08)', borderRadius: '16px', padding: '24px', backdropFilter: 'blur(16px)', display: 'flex', flexDirection: 'column', gap: '16px' }}>
           <div style={{ fontSize: '10px', letterSpacing: '0.2em', color: '#3d6e6a', textTransform: 'uppercase', fontWeight: 700 }}>
             QUICK STATS
           </div>
 
-          <div style={{ background: 'rgba(232,82,30,0.05)', border: '1px solid rgba(232,82,30,0.1)', borderRadius: '12px', padding: '16px' }}>
-            <div style={{ fontSize: '11px', color: '#7ea8a4', marginBottom: '4px' }}>Most Confident FAKE</div>
+          <div style={{ background: 'rgba(122,46,50,0.05)', border: '1px solid rgba(122,46,50,0.1)', borderRadius: '12px', padding: '16px' }}>
+            <div style={{ fontSize: '11px', color: 'var(--text-muted)', marginBottom: '4px' }}>Most Confident FAKE</div>
             {quickStats.maxFake ? (
               <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
-                <span style={{ color: '#dfe8e6', fontSize: '13px', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap', maxWidth: '70%' }}>
+                <span style={{ color: 'var(--text-main)', fontSize: '13px', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap', maxWidth: '70%' }}>
                   {quickStats.maxFake.filename}
                 </span>
-                <span style={{ color: '#e8521e', fontWeight: 600 }}>{quickStats.maxFake.confidence.toFixed(1)}%</span>
+                <span style={{ color: '#A63A3F', fontWeight: 600 }}>{quickStats.maxFake.confidence.toFixed(1)}%</span>
               </div>
             ) : (
-              <div style={{ color: 'rgba(255,255,255,0.3)', fontSize: '13px' }}>No fakes detected yet</div>
+              <div style={{ color: 'rgba(232,220,200,0.3)', fontSize: '13px' }}>No fakes detected yet</div>
             )}
           </div>
 
-          <div style={{ background: 'rgba(0,212,200,0.05)', border: '1px solid rgba(0,212,200,0.1)', borderRadius: '12px', padding: '16px' }}>
-            <div style={{ fontSize: '11px', color: '#7ea8a4', marginBottom: '4px' }}>Most Confident REAL</div>
+          <div style={{ background: 'rgba(123,157,174,0.05)', border: '1px solid rgba(123,157,174,0.1)', borderRadius: '12px', padding: '16px' }}>
+            <div style={{ fontSize: '11px', color: 'var(--text-muted)', marginBottom: '4px' }}>Most Confident REAL</div>
             {quickStats.maxReal ? (
               <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
-                <span style={{ color: '#dfe8e6', fontSize: '13px', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap', maxWidth: '70%' }}>
+                <span style={{ color: 'var(--text-main)', fontSize: '13px', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap', maxWidth: '70%' }}>
                   {quickStats.maxReal.filename}
                 </span>
-                <span style={{ color: '#00d4c8', fontWeight: 600 }}>{quickStats.maxReal.confidence.toFixed(1)}%</span>
+                <span style={{ color: '#C6A75E', fontWeight: 600 }}>{quickStats.maxReal.confidence.toFixed(1)}%</span>
               </div>
             ) : (
-              <div style={{ color: 'rgba(255,255,255,0.3)', fontSize: '13px' }}>No real voices detected yet</div>
+              <div style={{ color: 'rgba(232,220,200,0.3)', fontSize: '13px' }}>No real voices detected yet</div>
             )}
           </div>
 
           <div style={{ display: 'flex', gap: '16px' }}>
-            <div style={{ flex: 1, background: 'rgba(255,255,255,0.02)', border: '1px solid rgba(255,255,255,0.05)', borderRadius: '12px', padding: '16px', textAlign: 'center' }}>
+            <div style={{ flex: 1, background: 'rgba(232,220,200,0.02)', border: '1px solid rgba(232,220,200,0.05)', borderRadius: '12px', padding: '16px', textAlign: 'center' }}>
               <div style={{ fontSize: '24px', fontWeight: 800, color: '#f0a429', marginBottom: '4px' }}>{quickStats.streak}</div>
-              <div style={{ fontSize: '11px', color: '#7ea8a4', lineHeight: 1.2 }}>Longest Fake Streak</div>
+              <div style={{ fontSize: '11px', color: 'var(--text-muted)', lineHeight: 1.2 }}>Longest Fake Streak</div>
             </div>
-            <div style={{ flex: 1, background: 'rgba(255,255,255,0.02)', border: '1px solid rgba(255,255,255,0.05)', borderRadius: '12px', padding: '16px', textAlign: 'center' }}>
-              <div style={{ fontSize: '24px', fontWeight: 800, color: '#00d4c8', marginBottom: '4px' }}>{quickStats.todayCount}</div>
-              <div style={{ fontSize: '11px', color: '#7ea8a4', lineHeight: 1.2 }}>Analyses Today</div>
+            <div style={{ flex: 1, background: 'rgba(232,220,200,0.02)', border: '1px solid rgba(232,220,200,0.05)', borderRadius: '12px', padding: '16px', textAlign: 'center' }}>
+              <div style={{ fontSize: '24px', fontWeight: 800, color: '#C6A75E', marginBottom: '4px' }}>{quickStats.todayCount}</div>
+              <div style={{ fontSize: '11px', color: 'var(--text-muted)', lineHeight: 1.2 }}>Analyses Today</div>
             </div>
           </div>
         </div>
@@ -154,7 +145,7 @@ const HistoryPage = () => {
       {/* History Table */}
       <ErrorBoundary>
         <React.Suspense fallback={
-          <div style={{ height: 300, background: 'rgba(255,255,255,0.02)', borderRadius: 16, display: 'flex', alignItems: 'center', justifyContent: 'center', color: '#7ea8a4' }}>
+          <div style={{ height: 300, background: 'rgba(232,220,200,0.02)', borderRadius: 16, display: 'flex', alignItems: 'center', justifyContent: 'center', color: 'var(--text-muted)' }}>
             Loading table...
           </div>
         }>

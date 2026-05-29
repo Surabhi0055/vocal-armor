@@ -75,9 +75,9 @@ const LiveMonitorPage = () => {
 
       ctx.clearRect(0, 0, canvas.width, canvas.height);
       ctx.lineWidth = 2;
-      ctx.strokeStyle = '#e8521e';
+      ctx.strokeStyle = '#A63A3F';
       ctx.shadowBlur = 8;
-      ctx.shadowColor = '#e8521e';
+      ctx.shadowColor = '#A63A3F';
       ctx.beginPath();
 
       const sliceWidth = canvas.width / bufLen;
@@ -217,6 +217,19 @@ const LiveMonitorPage = () => {
       return;
     }
 
+    // Check if it's mostly silence (no voice detected)
+    let maxAmp = 0;
+    for (let i = 0; i < samples.length; i++) {
+      const abs = Math.abs(samples[i]);
+      if (abs > maxAmp) maxAmp = abs;
+    }
+
+    if (maxAmp < 0.02) {
+      setStatus('error');
+      setErrorMsg('No voice detected. Please speak clearly into the microphone.');
+      return;
+    }
+
     try {
       // Encode full session as WAV
       const wavBuffer = encodeWAV(samples, sampleRate);
@@ -290,32 +303,23 @@ const LiveMonitorPage = () => {
   }, []);
 
   const isRecording = status === 'recording';
-  const verdictColor = result?.is_deepfake ? '#e8521e' : '#00d4c8';
+  const verdictColor = result?.is_deepfake ? '#A63A3F' : '#C6A75E';
   const verdictGlow = result?.is_deepfake
-    ? '0 0 32px rgba(232,82,30,0.5)'
-    : '0 0 32px rgba(0,212,200,0.5)';
+    ? '0 0 32px rgba(122,46,50,0.5)'
+    : '0 0 32px rgba(123,157,174,0.5)';
 
   return (
     <div className="dashboard" style={{ paddingBottom: '100px' }}>
 
-      {/* Page Header */}
-      <div style={{ marginBottom: '40px' }}>
 
-        <h1 style={{ fontFamily: '"Bebas Neue", sans-serif', fontSize: '48px', fontWeight: 400, letterSpacing: '2px', lineHeight: 1, marginBottom: '12px', textTransform: 'uppercase' }}>
-          REAL-TIME <span style={{ color: '#e8521e', textShadow: '0 0 40px rgba(232,82,30,0.4)' }}>STREAM ANALYSIS</span>
-        </h1>
-        <p style={{ fontSize: '14px', color: '#7ea8a4', lineHeight: 1.6 }}>
-          Speak into your microphone. VocalArmor analyzes every 2-second window for deepfake patterns.
-        </p>
-      </div>
 
       {/* Main Card */}
-      <div style={{ background: '#0f2229', border: `1px solid ${isRecording ? 'rgba(232,82,30,0.3)' : 'rgba(255,255,255,0.08)'}`, borderRadius: '20px', padding: '32px', marginBottom: '24px', transition: 'border-color 0.3s', boxShadow: isRecording ? '0 0 40px rgba(232,82,30,0.1)' : 'none' }}>
+      <div style={{ background: 'var(--bg-card)', border: `1px solid ${isRecording ? 'rgba(122,46,50,0.3)' : 'rgba(255,255,255,0.08)'}`, borderRadius: '20px', padding: '32px', marginBottom: '24px', transition: 'border-color 0.3s', boxShadow: isRecording ? '0 0 40px rgba(122,46,50,0.1)' : 'none' }}>
 
         <ModelSelector selectedModel={selectedModel} onModelChange={setSelectedModel} />
 
         {/* Waveform Canvas */}
-        <div style={{ background: 'rgba(0,0,0,0.3)', borderRadius: '12px', padding: '8px', marginBottom: '28px', position: 'relative', overflow: 'hidden' }}>
+        <div style={{ background: 'rgba(232,220,200,0.3)', borderRadius: '12px', padding: '8px', marginBottom: '28px', position: 'relative', overflow: 'hidden' }}>
           <canvas
             ref={canvasRef}
             width={900}
@@ -337,12 +341,13 @@ const LiveMonitorPage = () => {
           {status === 'idle' && (
             <>
               <button
+                className="btn-primary"
                 onClick={startRecording}
-                style={{ display: 'flex', alignItems: 'center', gap: '10px', background: 'linear-gradient(135deg, #e8521e, #ff8a00)', color: 'white', border: 'none', borderRadius: '10px', padding: '14px 28px', fontSize: '14px', fontWeight: 700, cursor: 'pointer', letterSpacing: '1px', boxShadow: '0 4px 20px rgba(232,82,30,0.4)', transition: 'all 0.2s' }}>
+              >
                 <i className="ti ti-player-record" style={{ fontSize: '18px' }}></i>
                 START RECORDING
               </button>
-              <div style={{ fontSize: '13px', color: '#7ea8a4' }}>
+              <div style={{ fontSize: '13px', color: 'var(--text-muted)' }}>
                 Click to start recording your voice session
               </div>
             </>
@@ -351,26 +356,26 @@ const LiveMonitorPage = () => {
           {status === 'recording' && (
             <>
               <div style={{ display: 'flex', alignItems: 'center', gap: '12px' }}>
-                <div style={{ display: 'flex', alignItems: 'center', gap: '6px', color: '#e8521e', animation: 'livePulse 2s infinite' }}>
-                  <div style={{ width: '8px', height: '8px', borderRadius: '50%', background: '#e8521e' }}></div>
+                <div style={{ display: 'flex', alignItems: 'center', gap: '6px', color: '#A63A3F', animation: 'livePulse 2s infinite' }}>
+                  <div style={{ width: '8px', height: '8px', borderRadius: '50%', background: '#A63A3F' }}></div>
                   <span style={{ fontSize: '12px', fontWeight: 700, letterSpacing: '1px' }}>REC</span>
                 </div>
-                <div style={{ fontFamily: 'monospace', fontSize: '24px', color: '#e8521e', fontWeight: 700 }}>
+                <div style={{ fontFamily: 'monospace', fontSize: '24px', color: '#A63A3F', fontWeight: 700 }}>
                   {formatTime(recordingTime)}
                 </div>
               </div>
               <button
                 onClick={stopAndAnalyze}
-                style={{ display: 'flex', alignItems: 'center', gap: '10px', background: 'transparent', color: '#e8521e', border: '1px solid rgba(232,82,30,0.4)', borderRadius: '10px', padding: '14px 28px', fontSize: '14px', fontWeight: 700, cursor: 'pointer', letterSpacing: '1px' }}>
+                style={{ display: 'flex', alignItems: 'center', gap: '10px', background: 'transparent', color: '#A63A3F', border: '1px solid rgba(122,46,50,0.4)', borderRadius: '50px', padding: '14px 28px', fontSize: '14px', fontWeight: 700, cursor: 'pointer', letterSpacing: '1px' }}>
                 <i className="ti ti-player-stop" style={{ fontSize: '18px' }}></i>
                 STOP &amp; ANALYZE
               </button>
               <div style={{ display: 'flex', flexDirection: 'column', flex: 1, minWidth: '150px' }}>
-                <div style={{ fontSize: '13px', color: '#7ea8a4' }}>Recording in progress — speak now</div>
+                <div style={{ fontSize: '13px', color: 'var(--text-muted)' }}>Recording in progress — speak now</div>
                 <div style={{ height: '3px', background: 'rgba(255,255,255,0.05)', borderRadius: '2px', overflow: 'hidden', marginTop: '12px' }}>
                   <div style={{
                     width: `${audioLevel}%`, height: '100%',
-                    background: audioLevel > 70 ? '#e8521e' : audioLevel > 30 ? '#f0a429' : '#00d4c8',
+                    background: audioLevel > 70 ? '#A63A3F' : audioLevel > 30 ? '#C4956A' : '#C6A75E',
                     transition: 'width 0.1s, background 0.2s', borderRadius: '2px'
                   }} />
                 </div>
@@ -381,12 +386,12 @@ const LiveMonitorPage = () => {
 
           {status === 'analyzing' && (
             <>
-              <button disabled style={{ display: 'flex', alignItems: 'center', gap: '10px', background: 'rgba(255,255,255,0.05)', color: '#7ea8a4', border: '1px solid rgba(255,255,255,0.1)', borderRadius: '10px', padding: '14px 28px', fontSize: '14px', fontWeight: 700, cursor: 'not-allowed', letterSpacing: '1px' }}>
+              <button disabled style={{ display: 'flex', alignItems: 'center', gap: '10px', background: 'rgba(255,255,255,0.05)', color: 'var(--text-muted)', border: '1px solid rgba(255,255,255,0.1)', borderRadius: '10px', padding: '14px 28px', fontSize: '14px', fontWeight: 700, cursor: 'not-allowed', letterSpacing: '1px' }}>
                 <i className="ti ti-loader ti-spin" style={{ fontSize: '18px' }}></i>
                 ANALYZING...
               </button>
               <div style={{ display: 'flex', flexDirection: 'column', gap: '4px' }}>
-                <div style={{ fontSize: '13px', color: '#7ea8a4', fontWeight: 600 }}>Analyzing full session...</div>
+                <div style={{ fontSize: '13px', color: 'var(--text-muted)', fontWeight: 600 }}>Analyzing full session...</div>
                 <div style={{ fontSize: '12px', color: 'rgba(255,255,255,0.3)' }}>Running CNN inference on recorded audio</div>
               </div>
             </>
@@ -396,7 +401,7 @@ const LiveMonitorPage = () => {
             <>
               <button
                 onClick={resetRecording}
-                style={{ display: 'flex', alignItems: 'center', gap: '10px', background: 'transparent', color: '#00d4c8', border: '1px solid rgba(0,212,200,0.4)', borderRadius: '10px', padding: '14px 28px', fontSize: '14px', fontWeight: 700, cursor: 'pointer', letterSpacing: '1px' }}>
+                style={{ display: 'flex', alignItems: 'center', gap: '10px', background: 'transparent', color: '#C6A75E', border: '1px solid rgba(123,157,174,0.4)', borderRadius: '10px', padding: '14px 28px', fontSize: '14px', fontWeight: 700, cursor: 'pointer', letterSpacing: '1px' }}>
                 <i className="ti ti-refresh" style={{ fontSize: '18px' }}></i>
                 ANALYZE ANOTHER
               </button>
@@ -407,7 +412,7 @@ const LiveMonitorPage = () => {
             <>
               <button
                 onClick={resetRecording}
-                style={{ display: 'flex', alignItems: 'center', gap: '10px', background: 'transparent', color: '#7ea8a4', border: '1px solid rgba(255,255,255,0.2)', borderRadius: '10px', padding: '14px 28px', fontSize: '14px', fontWeight: 700, cursor: 'pointer', letterSpacing: '1px' }}>
+                style={{ display: 'flex', alignItems: 'center', gap: '10px', background: 'transparent', color: 'var(--text-muted)', border: '1px solid rgba(255,255,255,0.2)', borderRadius: '10px', padding: '14px 28px', fontSize: '14px', fontWeight: 700, cursor: 'pointer', letterSpacing: '1px' }}>
                 <i className="ti ti-refresh" style={{ fontSize: '18px' }}></i>
                 TRY AGAIN
               </button>
@@ -417,7 +422,7 @@ const LiveMonitorPage = () => {
 
         {/* Error Message */}
         {errorMsg && (
-          <div style={{ marginTop: '20px', background: 'rgba(232,82,30,0.08)', border: '1px solid rgba(232,82,30,0.3)', borderRadius: '10px', padding: '14px 16px', color: '#e8521e', fontSize: '13px', display: 'flex', gap: '10px', alignItems: 'flex-start' }}>
+          <div style={{ marginTop: '20px', background: 'rgba(122,46,50,0.08)', border: '1px solid rgba(122,46,50,0.3)', borderRadius: '10px', padding: '14px 16px', color: '#A63A3F', fontSize: '13px', display: 'flex', gap: '10px', alignItems: 'flex-start' }}>
             <i className="ti ti-alert-circle" style={{ fontSize: '18px', flexShrink: 0, marginTop: '1px' }}></i>
             {errorMsg}
           </div>
@@ -426,19 +431,19 @@ const LiveMonitorPage = () => {
 
       {/* Result Card */}
       {status === 'done' && result && (
-        <div style={{ background: '#0f2229', border: `1px solid ${result.is_deepfake ? 'rgba(232,82,30,0.3)' : 'rgba(0,212,200,0.3)'}`, borderRadius: '20px', padding: '32px', marginBottom: '24px', display: 'flex', flexWrap: 'wrap', alignItems: 'center', gap: '28px', boxShadow: verdictGlow }}>
-          <div style={{ width: '64px', height: '64px', borderRadius: '50%', background: result.is_deepfake ? 'rgba(232,82,30,0.12)' : 'rgba(0,212,200,0.12)', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: '28px', color: verdictColor, flexShrink: 0 }}>
+        <div style={{ background: 'var(--bg-card)', border: `1px solid ${result.is_deepfake ? 'rgba(122,46,50,0.3)' : 'rgba(123,157,174,0.3)'}`, borderRadius: '20px', padding: '32px', marginBottom: '24px', display: 'flex', flexWrap: 'wrap', alignItems: 'center', gap: '28px', boxShadow: verdictGlow }}>
+          <div style={{ width: '64px', height: '64px', borderRadius: '50%', background: result.is_deepfake ? 'rgba(122,46,50,0.12)' : 'rgba(123,157,174,0.12)', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: '28px', color: verdictColor, flexShrink: 0 }}>
             <i className={result.is_deepfake ? 'ti ti-alert-triangle' : 'ti ti-shield-check'}></i>
           </div>
           <div style={{ flex: 1, minWidth: '300px' }}>
-            <div style={{ fontSize: '10px', letterSpacing: '2px', color: '#7ea8a4', marginBottom: '6px' }}>LATEST ANALYSIS</div>
+            <div style={{ fontSize: '10px', letterSpacing: '2px', color: 'var(--text-muted)', marginBottom: '6px' }}>LATEST ANALYSIS</div>
             <div style={{ fontSize: '28px', fontWeight: 800, color: verdictColor, letterSpacing: '2px', marginBottom: '4px', textShadow: verdictGlow }}>
               {result.is_deepfake ? '⚠ AI DEEPFAKE DETECTED' : '✓ HUMAN VOICE VERIFIED'}
             </div>
             <div style={{ fontSize: '13px', color: 'rgba(255,255,255,0.5)' }}>
               Analyzed {recordingTime}s of audio
             </div>
-            <div style={{ fontSize: '11px', color: '#7ea8a4', marginTop: '8px' }}>
+            <div style={{ fontSize: '11px', color: 'var(--text-muted)', marginTop: '8px' }}>
               Session duration: {formatTime(recordingTime)} · Samples: {totalSamplesRecorded.toLocaleString()} · Rate: {actualSampleRateRef.current}Hz
             </div>
           </div>
@@ -446,7 +451,7 @@ const LiveMonitorPage = () => {
             <div style={{ fontSize: '40px', fontWeight: 800, color: verdictColor, lineHeight: 1 }}>
               {Number(result.confidence).toFixed(1)}%
             </div>
-            <div style={{ fontSize: '10px', color: '#7ea8a4', marginTop: '6px', letterSpacing: '1px' }}>CONFIDENCE</div>
+            <div style={{ fontSize: '10px', color: 'var(--text-muted)', marginTop: '6px', letterSpacing: '1px' }}>CONFIDENCE</div>
           </div>
 
           {result.heatmap && (
@@ -462,7 +467,7 @@ const LiveMonitorPage = () => {
               <div
                 style={{
                   fontSize: "12px",
-                  color: "#7ea8a4",
+                  color: "var(--text-muted)",
                   marginBottom: "16px",
                   textTransform: "uppercase",
                   letterSpacing: "1px",
@@ -482,7 +487,7 @@ const LiveMonitorPage = () => {
                     borderRadius: "12px",
                     border: "1px solid rgba(255,255,255,0.1)",
                     objectFit: "contain",
-                    boxShadow: "0 8px 32px rgba(0,0,0,0.4)"
+                    boxShadow: "0 8px 32px rgba(232,220,200,0.4)"
                   }}
                 />
               </div>
@@ -497,7 +502,7 @@ const LiveMonitorPage = () => {
                   margin: "16px auto 0"
                 }}
               >
-                The <span style={{ color: "#e8521e", fontWeight: "bold" }}>warm regions</span>{" "}
+                The <span style={{ color: "#A63A3F", fontWeight: "bold" }}>warm regions</span>{" "}
                 highlight the specific audio frequencies that triggered the AI's detection model.
               </p>
             </div>
@@ -507,10 +512,10 @@ const LiveMonitorPage = () => {
 
       {/* Empty state — no result yet */}
       {status === 'idle' && (
-        <div style={{ background: '#0f2229', border: '1px solid rgba(255,255,255,0.05)', borderRadius: '20px', padding: '60px 20px', textAlign: 'center' }}>
+        <div style={{ background: 'var(--bg-card)', border: '1px solid rgba(255,255,255,0.05)', borderRadius: '20px', padding: '60px 20px', textAlign: 'center' }}>
           <i className="ti ti-waveform" style={{ fontSize: '56px', color: 'rgba(255,255,255,0.1)', marginBottom: '20px', display: 'block' }}></i>
           <div style={{ fontSize: '16px', color: 'rgba(255,255,255,0.4)', marginBottom: '8px' }}>No analysis yet</div>
-          <div style={{ fontSize: '13px', color: '#7ea8a4' }}>Click START RECORDING above to begin</div>
+          <div style={{ fontSize: '13px', color: 'var(--text-muted)' }}>Click START RECORDING above to begin</div>
         </div>
       )}
 

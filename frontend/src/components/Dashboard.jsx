@@ -36,7 +36,7 @@ const Dashboard = () => {
     const bars = 100;
     const bw = W / bars;
     for (let i = 0; i < bars; i++) {
-      ctx.fillStyle = "rgba(0, 209, 224, 0.1)";
+      ctx.fillStyle = "rgba(78, 125, 150, 0.12)";
       ctx.beginPath();
       ctx.roundRect(i * bw, H / 2 - 1, bw - 1, 2, 1);
       ctx.fill();
@@ -93,9 +93,10 @@ const Dashboard = () => {
       freqData.forEach((val, i) => {
         const ratio = val / 255;
         const h = Math.max(3, ratio * H * 0.9);
-        const r = Math.round(0 + 242 * ratio);
-        const g = Math.round(209 - 117 * ratio);
-        const b = Math.round(224 - 132 * ratio);
+        // Nordic Lake → Marie gradient based on intensity
+        const r = Math.round(78 + (166 - 78) * ratio);
+        const g = Math.round(125 - (125 - 58) * ratio);
+        const b = Math.round(150 - (150 - 63) * ratio);
         canvasCtx.fillStyle = `rgba(${r},${g},${b},${0.5 + ratio * 0.5})`;
         canvasCtx.beginPath();
         canvasCtx.roundRect(i * (bw + 1), H - h, bw, h, 2);
@@ -198,38 +199,32 @@ const Dashboard = () => {
     }
   };
 
-  // ── Verdict helpers ───────────────────────────────────────────────────────
+  // Nordic Lake = real/human; Marie = fake/deepfake
   const isReal = result?.prediction === "REAL";
-  const verdictColor = isReal ? "#00d1e0" : "#f25c2c";
-  const verdictGlow = isReal
-    ? "0 0 32px rgba(0,209,224,0.35)"
-    : "0 0 32px rgba(242,92,44,0.35)";
-  const verdictBg = isReal ? "rgba(0,209,224,0.06)" : "rgba(242,92,44,0.06)";
-  const verdictBorder = isReal
-    ? "1px solid rgba(0,209,224,0.25)"
-    : "1px solid rgba(242,92,44,0.25)";
+  const verdictColor  = isReal ? "#C6A75E" : "#A63A3F";
+  const verdictGlow   = isReal ? "0 0 32px rgba(123,157,174,0.35)" : "0 0 32px rgba(122,46,50,0.45)";
+  const verdictBg     = isReal ? "rgba(123,157,174,0.07)" : "rgba(122,46,50,0.10)";
+  const verdictBorder = isReal ? "1px solid rgba(123,157,174,0.25)" : "1px solid rgba(122,46,50,0.30)";
 
   return (
     <div className="dashboard">
       {/* ── Hero ── */}
       <div className="hero-section">
         <h1 className="hero-title">
-          DETECT AI <span className="text-orange">VOICES</span>
+          DETECT AI <span className="text-marie">VOICES</span>
           <br />
           BEFORE THEY{" "}
           <span
             className="val-cyan"
-            style={{ textShadow: "0 0 60px rgba(0,212,200,0.5)" }}
+            style={{ textShadow: "0 0 60px rgba(123,157,174,0.5)" }}
           >
             DECEIVE
           </span>
         </h1>
         <p className="hero-subtitle">
-          Real-time deepfake voice detection powered by CNN
+          Real-time deepfake voice detection via spectrogram analysis.
           <br />
-          spectrogram analysis. Upload any audio — get a verdict in
-          <br />
-          under two seconds.
+          Upload any audio — get a verdict in under 2 seconds.
         </p>
       </div>
 
@@ -246,7 +241,7 @@ const Dashboard = () => {
             display: "flex",
             gap: "16px",
             marginBottom: "20px",
-            borderBottom: "1px solid rgba(255,255,255,0.1)",
+            borderBottom: "1px solid rgba(232,220,200,0.1)",
             paddingBottom: "12px",
           }}
         >
@@ -255,7 +250,7 @@ const Dashboard = () => {
             style={{
               background: "transparent",
               border: "none",
-              color: activeTab === "file" ? "#00d1e0" : "rgba(255,255,255,0.5)",
+          color: activeTab === "file" ? "var(--accent-nordic)" : "rgba(26,18,16,0.40)",
               fontSize: "14px",
               fontWeight: 600,
               cursor: "pointer",
@@ -264,7 +259,7 @@ const Dashboard = () => {
               gap: "8px",
               borderBottom:
                 activeTab === "file"
-                  ? "2px solid #00d1e0"
+                  ? "2px solid var(--accent-nordic)"
                   : "2px solid transparent",
               paddingBottom: "14px",
               marginBottom: "-14px",
@@ -277,7 +272,7 @@ const Dashboard = () => {
             style={{
               background: "transparent",
               border: "none",
-              color: activeTab === "url" ? "#00d1e0" : "rgba(255,255,255,0.5)",
+              color: activeTab === "url" ? "var(--accent-nordic)" : "rgba(26,18,16,0.40)",
               fontSize: "14px",
               fontWeight: 600,
               cursor: "pointer",
@@ -286,7 +281,7 @@ const Dashboard = () => {
               gap: "8px",
               borderBottom:
                 activeTab === "url"
-                  ? "2px solid #00d1e0"
+                  ? "2px solid var(--accent-nordic)"
                   : "2px solid transparent",
               paddingBottom: "14px",
               marginBottom: "-14px",
@@ -364,7 +359,7 @@ const Dashboard = () => {
                   left: "16px",
                   top: "50%",
                   transform: "translateY(-50%)",
-                  color: "var(--accent-cyan)",
+                  color: "var(--accent-nordic)",
                   fontSize: "20px",
                 }}
               ></i>
@@ -377,9 +372,9 @@ const Dashboard = () => {
                   width: "100%",
                   padding: "16px 16px 16px 48px",
                   borderRadius: "12px",
-                  background: "rgba(0, 209, 224, 0.05)",
-                  border: "1px solid rgba(0, 209, 224, 0.2)",
-                  color: "white",
+                  background: "var(--nordic-dim)",
+                  border: "1px solid var(--nordic-border)",
+                  color: "var(--text-card)",
                   fontSize: "14px",
                   outline: "none",
                   fontFamily: "inherit",
@@ -408,9 +403,9 @@ const Dashboard = () => {
           style={{
             display: (isAnalyzing || result) ? "block" : "none",
             marginTop: "20px",
-            background: "rgba(0,0,0,0.25)",
+            background: "rgba(232,220,200,0.25)",
             borderRadius: "12px",
-            border: "1px solid rgba(0,209,224,0.12)",
+            border: "1px solid var(--nordic-border)",
             padding: "12px 16px",
             position: "relative",
             overflow: "hidden",
@@ -467,7 +462,7 @@ const Dashboard = () => {
                 style={{
                   fontSize: "11px",
                   letterSpacing: "2px",
-                  color: "rgba(255,255,255,0.4)",
+                  color: "rgba(232,220,200,0.4)",
                   marginBottom: "4px",
                 }}
               >
@@ -485,7 +480,7 @@ const Dashboard = () => {
               >
                 {result.prediction === "REAL" ? "HUMAN VOICE" : "AI DEEPFAKE"}
               </div>
-              <div style={{ fontSize: "13px", color: "rgba(255,255,255,0.6)" }}>
+              <div style={{ fontSize: "13px", color: "rgba(232,220,200,0.6)" }}>
                 {result.message}
               </div>
             </div>
@@ -510,7 +505,7 @@ const Dashboard = () => {
                 style={{
                   fontSize: "10px",
                   letterSpacing: "1.5px",
-                  color: "rgba(255,255,255,0.4)",
+                  color: "rgba(232,220,200,0.4)",
                   marginTop: "4px",
                 }}
               >
@@ -525,14 +520,14 @@ const Dashboard = () => {
                   width: "100%",
                   marginTop: "16px",
                   paddingTop: "16px",
-                  borderTop: "1px solid rgba(255,255,255,0.1)",
+                  borderTop: "1px solid rgba(232,220,200,0.1)",
                   animation: "fadeIn 0.5s ease-out",
                 }}
               >
                 <div
                   style={{
                     fontSize: "12px",
-                    color: "#7ea8a4",
+                    color: "var(--text-muted)",
                     marginBottom: "16px",
                     textTransform: "uppercase",
                     letterSpacing: "1px",
@@ -550,16 +545,16 @@ const Dashboard = () => {
                       width: "100%",
                       maxWidth: "280px",
                       borderRadius: "12px",
-                      border: "1px solid rgba(255,255,255,0.1)",
+                      border: "1px solid rgba(232,220,200,0.1)",
                       objectFit: "contain",
-                      boxShadow: "0 8px 32px rgba(0,0,0,0.4)"
+                      boxShadow: "0 8px 32px rgba(232,220,200,0.4)"
                     }}
                   />
                 </div>
                 <p
                   style={{
                     fontSize: "12px",
-                    color: "rgba(255,255,255,0.6)",
+                    color: "rgba(232,220,200,0.6)",
                     marginTop: "16px",
                     lineHeight: 1.5,
                     textAlign: "center",
@@ -567,52 +562,13 @@ const Dashboard = () => {
                     margin: "16px auto 0"
                   }}
                 >
-                  The <span style={{ color: "#e8521e", fontWeight: "bold" }}>warm regions</span>{" "}
+                   The <span style={{ color: "var(--accent-nordic)", fontWeight: "bold" }}>warm regions</span>{" "}
                   highlight the specific audio frequencies that triggered the AI's detection model.
                 </p>
               </div>
             )}
           </div>
         )}
-      </div>
-
-      <div className="section-divider">
-        <span className="section-divider-text">MODEL ACCURACY</span>
-      </div>
-
-      <div className="accuracy-grid">
-        <div className="accuracy-card">
-          <div className="accuracy-value val-cyan">98.1%</div>
-          <div className="accuracy-desc">
-            Validation accuracy on held-out dataset of 6,200 samples
-          </div>
-        </div>
-        <div className="accuracy-card">
-          <div className="accuracy-value val-orange">0.3%</div>
-          <div className="accuracy-desc">
-            False negative rate — real voice incorrectly flagged as fake
-          </div>
-        </div>
-        <div className="accuracy-card">
-          <div className="accuracy-value val-white">1.6%</div>
-          <div className="accuracy-desc">
-            False positive rate — deepfake voice slipping through as real
-          </div>
-        </div>
-        <div className="accuracy-card">
-          <div
-            className="accuracy-value val-orange"
-            style={{
-              color: "#ffc107",
-              textShadow: "0 0 40px rgba(255,193,7,0.4)",
-            }}
-          >
-            31K+
-          </div>
-          <div className="accuracy-desc">
-            Total voice samples analyzed since public launch
-          </div>
-        </div>
       </div>
 
       {/* ── FOOTER ── */}

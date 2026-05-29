@@ -5,9 +5,9 @@ import { getHistory } from '../utils/storage';
 const CustomTooltip = ({ active, payload, label }) => {
   if (!active || !payload?.length) return null;
   return (
-    <div style={{ background: '#0b1d22', border: '1px solid rgba(0,212,200,0.2)', borderRadius: 8, padding: '10px 14px' }}>
-      <p style={{ color: '#7ea8a4', fontSize: 11, marginBottom: 4, fontWeight: 600 }}>Confidence: {label}</p>
-      <p style={{ color: 'white', fontSize: 13 }}>Count: {payload[0].value}</p>
+    <div style={{ background: '#0b1d22', border: '1px solid rgba(123,157,174,0.2)', borderRadius: 8, padding: '10px 14px' }}>
+      <p style={{ color: 'var(--text-muted)', fontSize: 11, marginBottom: 4, fontWeight: 600 }}>Confidence: {label}</p>
+      <p style={{ color: 'var(--text-card)', fontSize: 13 }}>Count: {payload[0].value}</p>
     </div>
   );
 };
@@ -56,10 +56,10 @@ const ConfidenceHistogram = () => {
     return `${pct}% of ${targetLabel} were detected with 90%+ confidence — indicating the model is highly certain on most samples.`;
   }, [chartData, type]);
 
-  const color = type === 'FAKE' ? '#e8521e' : '#00d4c8';
+  const color = type === 'FAKE' ? '#A63A3F' : '#C6A75E';
 
   return (
-    <div style={{ background: '#0f2229', border: '1px solid rgba(255,255,255,0.08)', borderRadius: '16px', padding: '24px', backdropFilter: 'blur(16px)', height: '100%', display: 'flex', flexDirection: 'column' }}>
+    <div style={{ background: 'var(--bg-card)', border: '1px solid rgba(232,220,200,0.08)', borderRadius: '16px', padding: '24px', backdropFilter: 'blur(16px)', height: '100%', display: 'flex', flexDirection: 'column' }}>
       
       <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', marginBottom: '32px', flexWrap: 'wrap', gap: '16px' }}>
         <div>
@@ -68,13 +68,13 @@ const ConfidenceHistogram = () => {
           </div>
         </div>
         
-        <div style={{ display: 'flex', background: 'rgba(255,255,255,0.05)', borderRadius: '6px', overflow: 'hidden', border: '1px solid rgba(255,255,255,0.1)' }}>
+        <div style={{ display: 'flex', background: 'rgba(232,220,200,0.05)', borderRadius: '6px', overflow: 'hidden', border: '1px solid rgba(232,220,200,0.1)' }}>
           <button 
             onClick={() => setType('FAKE')}
             style={{ 
               padding: '6px 12px', border: 'none', cursor: 'pointer', fontSize: '12px', fontWeight: 600,
-              background: type === 'FAKE' ? 'rgba(232,82,30,0.15)' : 'transparent',
-              color: type === 'FAKE' ? '#e8521e' : '#7ea8a4'
+              background: type === 'FAKE' ? 'rgba(122,46,50,0.15)' : 'transparent',
+              color: type === 'FAKE' ? '#A63A3F' : 'var(--text-muted)'
             }}
           >
             FAKE
@@ -83,8 +83,8 @@ const ConfidenceHistogram = () => {
             onClick={() => setType('REAL')}
             style={{ 
               padding: '6px 12px', border: 'none', cursor: 'pointer', fontSize: '12px', fontWeight: 600,
-              background: type === 'REAL' ? 'rgba(0,212,200,0.15)' : 'transparent',
-              color: type === 'REAL' ? '#00d4c8' : '#7ea8a4'
+              background: type === 'REAL' ? 'rgba(123,157,174,0.15)' : 'transparent',
+              color: type === 'REAL' ? '#C6A75E' : 'var(--text-muted)'
             }}
           >
             REAL
@@ -93,7 +93,7 @@ const ConfidenceHistogram = () => {
       </div>
 
       {chartData.reduce((sum, b) => sum + b.count, 0) === 0 ? (
-        <div style={{ flex: 1, display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', color: '#7ea8a4', minHeight: 250 }}>
+        <div style={{ flex: 1, display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', color: 'var(--text-muted)', minHeight: 250 }}>
           <i className="ti ti-chart-bar" style={{ fontSize: 48, opacity: 0.3, marginBottom: 16 }}></i>
           <div>No {type.toLowerCase()} data available yet.</div>
         </div>
@@ -102,10 +102,10 @@ const ConfidenceHistogram = () => {
           <div style={{ height: 250, width: '100%', marginBottom: '24px' }}>
             <ResponsiveContainer width="100%" height="100%">
               <BarChart data={chartData} margin={{ top: 10, right: 10, left: -20, bottom: 0 }}>
-                <CartesianGrid strokeDasharray="3 3" stroke="rgba(255,255,255,0.05)" vertical={false} />
-                <XAxis dataKey="range" stroke="#7ea8a4" fontSize={10} tickLine={false} axisLine={false} />
-                <YAxis stroke="#7ea8a4" fontSize={11} tickLine={false} axisLine={false} />
-                <Tooltip content={<CustomTooltip />} cursor={{ fill: 'rgba(255,255,255,0.05)' }} />
+                <CartesianGrid strokeDasharray="3 3" stroke="rgba(232,220,200,0.05)" vertical={false} />
+                <XAxis dataKey="range" stroke="var(--text-muted)" fontSize={10} tickLine={false} axisLine={false} />
+                <YAxis stroke="var(--text-muted)" fontSize={11} tickLine={false} axisLine={false} />
+                <Tooltip content={<CustomTooltip />} cursor={{ fill: 'rgba(232,220,200,0.05)' }} />
                 <Bar dataKey="count" radius={[4, 4, 0, 0]}>
                   {chartData.map((entry, index) => (
                     <Cell key={`cell-${index}`} fill={color} fillOpacity={0.8} style={{ transition: 'all 0.2s' }} />

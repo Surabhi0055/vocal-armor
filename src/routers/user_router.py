@@ -5,6 +5,12 @@ from database import get_db
 from models import User
 from schemas import UserOut, UserUpdate
 import shutil, os, uuid
+from pathlib import Path
+
+# Absolute path to uploads/avatars, relative to this file's location
+BASE_DIR = Path(__file__).resolve().parent.parent
+AVATAR_DIR = BASE_DIR / "uploads" / "avatars"
+AVATAR_DIR.mkdir(parents=True, exist_ok=True)
 
 router = APIRouter(prefix="/users", tags=["Users"])
 
@@ -41,16 +47,13 @@ def upload_avatar(
     ext = file.filename.split('.')[-1]
     filename = f"{uuid.uuid4()}.{ext}"
     
-    # Store avatars in a local directory
-    upload_dir = os.path.join("uploads", "avatars")
-    os.makedirs(upload_dir, exist_ok=True)
-    filepath = os.path.join(upload_dir, filename)
+    # Store avatars using absolute path so location is consistent
+    filepath = AVATAR_DIR / filename
     
     with open(filepath, "wb") as buffer:
         shutil.copyfileobj(file.file, buffer)
         
-    # Assuming backend runs on localhost:8000 for local dev
-    # In production, use a relative URL or base URL from env
+    # Build the public URL served via the /uploads static mount
     base_url = os.getenv("BACKEND_URL", "http://localhost:8000")
     current_user.avatar_url = f"{base_url}/uploads/avatars/{filename}"
     

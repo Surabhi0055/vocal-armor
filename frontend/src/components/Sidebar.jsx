@@ -21,7 +21,7 @@ const Sidebar = () => {
         <div className="sidebar-logo-icon">
           <VAIcon size={32} style={{ borderRadius: '8px' }} />
         </div>
-        <span className="sidebar-logo-text" style={{ fontFamily: '"Space Grotesk", sans-serif', letterSpacing: '1px', fontSize: '13px' }}><span style={{ fontWeight: 800, color: '#fff' }}>VOCAL</span><span style={{ fontWeight: 300, color: '#1dcfcf' }}>ARMOR</span></span>
+        <span className="sidebar-logo-text" style={{ fontFamily: '"Space Grotesk", sans-serif', letterSpacing: '1px', fontSize: '13px' }}><span style={{ fontWeight: 800, color: 'var(--text-main)' }}>VOCAL</span><span style={{ fontWeight: 300, color: '#C6A75E' }}>ARMOR</span></span>
       </div>
 
       <div className="sidebar-top">
@@ -58,14 +58,14 @@ const Sidebar = () => {
           
           <div onClick={() => navigate('/user')} style={{ display: 'flex', alignItems: 'center', gap: '12px', background: 'rgba(255,255,255,0.02)', border: '1px solid rgba(255,255,255,0.05)', padding: '6px', borderRadius: '30px', width: '90%', transition: 'all 0.3s', cursor: 'pointer', overflow: 'hidden' }}>
             {user?.avatar_url ? (
-              <img src={user.avatar_url} alt="Profile" style={{ minWidth: '36px', height: '36px', borderRadius: '50%', objectFit: 'cover', boxShadow: '0 4px 10px rgba(0,0,0,0.3)', flexShrink: 0 }} />
+              <img src={user.avatar_url} alt="Profile" style={{ minWidth: '36px', height: '36px', borderRadius: '50%', objectFit: 'cover', boxShadow: '0 4px 10px rgba(232,220,200,0.3)', flexShrink: 0 }} />
             ) : (
-              <div style={{ minWidth: '36px', height: '36px', borderRadius: '50%', background: 'linear-gradient(135deg, #00d4c8, #0088ff)', display: 'flex', alignItems: 'center', justifyContent: 'center', fontWeight: 800, fontSize: '14px', color: 'white', fontFamily: '"Bebas Neue", sans-serif', letterSpacing: '1px', boxShadow: '0 4px 10px rgba(0,0,0,0.3)', flexShrink: 0 }}>
+              <div style={{ minWidth: '36px', height: '36px', borderRadius: '50%', background: 'linear-gradient(135deg, #C6A75E, #7A2E32)', display: 'flex', alignItems: 'center', justifyContent: 'center', fontWeight: 800, fontSize: '14px', color: 'var(--text-main)', fontFamily: '"Bebas Neue", sans-serif', letterSpacing: '1px', boxShadow: '0 4px 10px rgba(232,220,200,0.3)', flexShrink: 0 }}>
                 {initials}
               </div>
             )}
             <div className="side-text" style={{ margin: 0, display: 'flex', flexDirection: 'column', overflow: 'hidden' }}>
-              <span style={{ fontSize: '14px', fontWeight: 600, color: 'white', whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>{fullName}</span>
+              <span style={{ fontSize: '14px', fontWeight: 600, color: 'var(--text-main)', whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>{fullName}</span>
               <span style={{ fontSize: '11px', color: 'var(--text-muted)', whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>{email}</span>
             </div>
           </div>

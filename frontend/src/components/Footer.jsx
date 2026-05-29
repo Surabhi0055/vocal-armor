@@ -29,15 +29,15 @@ const Footer = () => {
       <div style={{ display: 'flex', flexDirection: 'column', gap: '16px' }}>
         <div style={{ display: 'flex', alignItems: 'center', gap: '10px', cursor: 'pointer' }} onClick={() => window.scrollTo({ top: 0, behavior: 'smooth' })}>
           <VAIcon size={22} style={{ borderRadius: '4px' }} />
-          <span style={{ fontFamily: '"Space Grotesk", sans-serif', fontSize: '14px', letterSpacing: '1px', color: '#fff' }}>
+          <span style={{ fontFamily: '"Space Grotesk", sans-serif', fontSize: '14px', letterSpacing: '1px', color: 'var(--text-main)' }}>
             <span style={{ fontWeight: 800 }}>VOCAL</span>
-            <span style={{ fontWeight: 300, color: '#1dcfcf' }}>ARMOR</span>
+            <span style={{ fontWeight: 300, color: '#C6A75E' }}>ARMOR</span>
           </span>
-          <span style={{ fontFamily: '"DM Mono", monospace', fontSize: '11px', color: '#7a8f94', marginLeft: '6px' }}>· MIT License</span>
+          <span style={{ fontFamily: '"DM Mono", monospace', fontSize: '11px', color: 'var(--text-muted)', marginLeft: '6px' }}>· MIT License</span>
         </div>
 
         <div style={{ display: 'flex', alignItems: 'center', gap: '20px' }}>
-          <span style={{ fontFamily: '"DM Mono", monospace', fontSize: '11px', color: 'rgba(29,207,207,0.45)', letterSpacing: '0.05em' }}>
+          <span style={{ fontFamily: '"DM Mono", monospace', fontSize: '11px', color: 'rgba(232,220,200,0.50)', letterSpacing: '0.05em' }}>
             Built with TensorFlow · FastAPI
           </span>
           <a 
@@ -48,13 +48,13 @@ const Footer = () => {
               display: 'flex',
               alignItems: 'center',
               gap: '6px',
-              color: '#7a8f94',
+              color: 'var(--text-muted)',
               textDecoration: 'none',
               fontSize: '12px',
               transition: 'color 0.2s'
             }}
-            onMouseOver={e => e.currentTarget.style.color = '#1dcfcf'}
-            onMouseOut={e => e.currentTarget.style.color = '#7a8f94'}
+            onMouseOver={e => e.currentTarget.style.color = '#C6A75E'}
+            onMouseOut={e => e.currentTarget.style.color = 'var(--text-muted)'}
           >
             <i className="ti ti-brand-github" style={{ fontSize: '18px' }}></i>
             <span>Surabhi0055</span>
@@ -72,7 +72,7 @@ const Footer = () => {
               style={{
                 fontFamily: "'Space Grotesk', sans-serif",
                 fontSize: '13px',
-                color: isActive ? '#1dcfcf' : '#7a8f94',
+                color: isActive ? '#C6A75E' : '#7a8f94',
                 textDecoration: 'none',
                 cursor: 'pointer',
                 fontWeight: isActive ? '600' : '400',
