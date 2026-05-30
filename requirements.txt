@@ -34,3 +34,4 @@ python-dotenv
 
 # ── Remote Audio Extraction ───────────────────────────────────────────────────
 yt-dlp
+itsdangerous
