@@ -6,7 +6,7 @@ import VAIcon from '../components/VAIcon';
 
 const G = `
 @import url('https://fonts.googleapis.com/css2?family=Bebas+Neue&family=Syne:wght@400;500;600;700;800&family=Space+Grotesk:wght@300;400;500;600;700;800&display=swap');
-:root{--bg:#1F2A44;--marie:#A63A3F;--nordic:#C6A75E;--cream:#E8DCC8;--muted:rgba(232,220,200,0.6);}
+:root{--bg:#1E1D1B;--marie:#A63A3F;--nordic:#C6A75E;--cream:#E8DCC8;--muted:rgba(232,220,200,0.6);}
 *,*::before,*::after{box-sizing:border-box;margin:0;padding:0;}
 html{scroll-behavior:smooth;}
 body{background:var(--bg);font-family:'Space Grotesk',sans-serif;color:var(--cream);overflow-x:hidden;}
@@ -20,7 +20,7 @@ body{background:var(--bg);font-family:'Space Grotesk',sans-serif;color:var(--cre
 .gl:hover{border-color:rgba(123,157,174,.28);}
 .nl{font-family:'Space Grotesk',sans-serif;font-size:13px;font-weight:600;color:var(--muted);cursor:pointer;letter-spacing:.04em;transition:color .2s;}
 .nl:hover{color:#fff;}
-.bp{font-family:'Space Grotesk',sans-serif;font-size:14px;font-weight:700;padding:12px 28px;border-radius:50px;border:1px solid rgba(232,220,200,0.5);cursor:pointer;background:linear-gradient(90deg, #C6A75E, #1F2A44);color:#E8DCC8;letter-spacing:.04em;transition:opacity .2s,transform .2s;}
+.bp{font-family:'Space Grotesk',sans-serif;font-size:14px;font-weight:700;padding:12px 28px;border-radius:50px;border:1px solid rgba(232,220,200,0.5);cursor:pointer;background:linear-gradient(90deg, #C6A75E, #A38A4B);color:#1E1D1B;letter-spacing:.04em;transition:opacity .2s,transform .2s;}
 .bp:hover{opacity:.85;transform:scale(1.03);}
 .bg{font-family:'Space Grotesk',sans-serif;font-size:14px;font-weight:600;padding:12px 28px;border-radius:50px;border:1px solid #C6A75E;cursor:pointer;background:transparent;color:#E8DCC8;letter-spacing:.04em;transition:background .2s;}
 .bg:hover{background:rgba(198,167,94,.10);}
@@ -50,11 +50,146 @@ body{background:var(--bg);font-family:'Space Grotesk',sans-serif;color:var(--cre
   display: flex; align-items: center; justify-content: center;
   font-family: 'Space Grotesk', sans-serif; font-weight: 700; font-size: 13px; margin-bottom: 40px;
 }
+.get-started-btn {
+  font-family: 'Space Grotesk', sans-serif;
+  font-weight: 700;
+  border-radius: 50px;
+  border: 1px solid rgba(198, 167, 94, 0.4);
+  cursor: pointer;
+  background: linear-gradient(90deg, #C6A75E, #A38A4B);
+  color: #1E1D1B;
+  letter-spacing: .04em;
+  transition: all 0.4s cubic-bezier(0.25, 0.8, 0.25, 1);
+  box-shadow: 0 4px 15px rgba(198, 167, 94, 0.15);
+}
+.get-started-btn:hover {
+  background: linear-gradient(90deg, #A63A3F, #C6A75E) !important;
+  color: #FFFFFF !important;
+  border-color: rgba(232, 220, 200, 0.6) !important;
+  transform: translateY(-3px) scale(1.03);
+  box-shadow: 0 10px 25px rgba(166, 58, 63, 0.45) !important;
+}
 `;
 
 const scrollTo = (id) => {
   const el = document.getElementById(id);
   if (el) el.scrollIntoView({ behavior: 'smooth', block: 'start' });
+};
+
+const DiagonalWaveform = () => {
+  const canvasRef = useRef(null);
+
+  useEffect(() => {
+    const canvas = canvasRef.current;
+    if (!canvas) return;
+    const ctx = canvas.getContext('2d');
+    let animationFrameId;
+
+    let width = canvas.parentElement.clientWidth;
+    let height = canvas.parentElement.clientHeight;
+    canvas.width = width;
+    canvas.height = height;
+
+    let mouseX = width * 0.5;
+    let mouseY = height * 0.5;
+
+    const handleResize = () => {
+      if (!canvas.parentElement) return;
+      width = canvas.parentElement.clientWidth;
+      height = canvas.parentElement.clientHeight;
+      canvas.width = width;
+      canvas.height = height;
+    };
+
+    const handleMouseMove = (e) => {
+      const rect = canvas.getBoundingClientRect();
+      mouseX = e.clientX - rect.left;
+      mouseY = e.clientY - rect.top;
+    };
+
+    window.addEventListener('resize', handleResize);
+    window.addEventListener('mousemove', handleMouseMove);
+
+    let time = 0;
+    const lines = 6;
+
+    const draw = () => {
+      ctx.clearRect(0, 0, width, height);
+      time += 0.015;
+
+      for (let i = 0; i < lines; i++) {
+        ctx.beginPath();
+
+        const gradient = ctx.createLinearGradient(width * 0.38, 0, width * 0.92, height);
+        if (i % 3 === 0) {
+          gradient.addColorStop(0,   'rgba(166, 58, 63, 0.01)');
+          gradient.addColorStop(0.15, 'rgba(166, 58, 63, 0.55)');
+          gradient.addColorStop(0.80, 'rgba(166, 58, 63, 0.55)');
+          gradient.addColorStop(1,   'rgba(166, 58, 63, 0.40)');
+        } else if (i % 3 === 1) {
+          gradient.addColorStop(0,   'rgba(198, 167, 94, 0.01)');
+          gradient.addColorStop(0.15, 'rgba(198, 167, 94, 0.50)');
+          gradient.addColorStop(0.80, 'rgba(198, 167, 94, 0.50)');
+          gradient.addColorStop(1,   'rgba(198, 167, 94, 0.35)');
+        } else {
+          gradient.addColorStop(0,   'rgba(232, 220, 200, 0.01)');
+          gradient.addColorStop(0.15, 'rgba(232, 220, 200, 0.30)');
+          gradient.addColorStop(0.80, 'rgba(232, 220, 200, 0.30)');
+          gradient.addColorStop(1,   'rgba(232, 220, 200, 0.20)');
+        }
+
+        ctx.strokeStyle = gradient;
+        ctx.lineWidth = 2.5;
+
+        const startX = width * 0.38;
+        const startY = 0;
+        const endX = width * 0.92;
+        const endY = height;
+
+        const angle = Math.atan2(endY - startY, endX - startX);
+        const perpAngle = angle + Math.PI / 2;
+        const diagonalLength = Math.sqrt((endX - startX) ** 2 + (endY - startY) ** 2);
+
+        for (let d = 0; d < diagonalLength; d += 6) {
+          const px = startX + d * Math.cos(angle);
+          const py = startY + d * Math.sin(angle);
+
+          // Interactive mouse cursor influence relative to this diagonal path point
+          const dx = px - mouseX;
+          const dy = py - mouseY;
+          const dist = Math.sqrt(dx * dx + dy * dy);
+          
+          let mouseInfluence = Math.max(0, 1 - dist / 450);
+          mouseInfluence = Math.pow(mouseInfluence, 2) * 160;
+
+          // Elegant base amplitude and frequency tuned to look beautifully wavy but sweeping and clean
+          const baseAmp = (40 + (i * 15)) * 1.25;
+          const freq = (0.002 + (i * 0.0005)) * 1.5;
+          const waveOffset = Math.sin(d * freq + time + i) * Math.cos(d * 0.0012 - time) * (baseAmp + mouseInfluence);
+
+          // Displace perpendicularly to the diagonal line for pure mathematical wave curvature
+          const x = px + waveOffset * Math.cos(perpAngle);
+          const y = py + waveOffset * Math.sin(perpAngle);
+
+          if (d === 0) ctx.moveTo(x, y);
+          else ctx.lineTo(x, y);
+        }
+        ctx.stroke();
+      }
+
+      animationFrameId = requestAnimationFrame(draw);
+    };
+
+    draw();
+
+    return () => {
+      window.removeEventListener('resize', handleResize);
+      window.removeEventListener('mousemove', handleMouseMove);
+      cancelAnimationFrame(animationFrameId);
+    };
+  }, []);
+
+  return <canvas ref={canvasRef} style={{ width: '100%', height: '100%', display: 'block' }} />;
 };
 
 export default function LandingPage() {
@@ -67,6 +202,14 @@ export default function LandingPage() {
   const mouse = useRef({ x: -999, y: -999 });
   const rPos = useRef({ x: -999, y: -999 });
   const [scrolled, setScrolled] = useState(false);
+  const [isExiting, setIsExiting] = useState(false);
+
+  const handleTransitionNavigate = (targetPath) => {
+    setIsExiting(true);
+    setTimeout(() => {
+      navigate(targetPath);
+    }, 600);
+  };
 
   useEffect(() => {
     const prev = { ov: document.body.style.overflow, h: document.body.style.height };
@@ -110,7 +253,6 @@ export default function LandingPage() {
     return () => io.disconnect();
   }, []);
 
-
   const S = {
     syne:  { fontFamily: "'Syne', sans-serif" },          // headings & feature titles
     epi:   { fontFamily: "'Syne', sans-serif" },           // descriptive / body text
@@ -133,20 +275,29 @@ export default function LandingPage() {
   return (
     <>
       <style>{G}</style>
-      <WaveformBackground />
 
-      <div style={{ width: '100vw', minHeight: '100vh', background: 'transparent', position: 'relative', zIndex: 10, overflowX: 'hidden' }}>
+      <div style={{
+        width: '100vw',
+        minHeight: '100vh',
+        background: 'transparent',
+        position: 'relative',
+        zIndex: 10,
+        overflowX: 'hidden',
+        transform: isExiting ? 'translateX(-100vw)' : 'translateX(0)',
+        opacity: isExiting ? 0 : 1,
+        transition: 'transform 0.65s cubic-bezier(0.76, 0, 0.24, 1), opacity 0.65s ease-in-out'
+      }}>
 
         {/* ── NAV ── */}
         <nav style={{
           position: 'sticky', top: 0, zIndex: 100, display: 'flex', alignItems: 'center',
           justifyContent: 'space-between', padding: '0 5%', height: '64px',
-          background: 'rgba(23,32,54,0.92)', backdropFilter: 'blur(24px)',
-          borderBottom: `1px solid ${scrolled ? 'rgba(198,167,94,0.50)' : 'rgba(198,167,94,0.1)'}`,
+          background: 'rgba(21,20,18,0.92)', backdropFilter: 'blur(24px)',
+          borderBottom: '1px solid rgba(198, 167, 94, 0.50)',
           transition: 'border-color 0.4s',
         }}>
           <div style={{ display: 'flex', alignItems: 'center', gap: '10px', cursor: 'pointer' }} onClick={() => scrollTo('hero')}>
-          <VAIcon size={32} style={{ borderRadius: '6px' }} />
+            <VAIcon size={32} style={{ borderRadius: '6px' }} />
             <span style={{ fontFamily: '"Space Grotesk", sans-serif', fontSize: '17px', letterSpacing: '1px', color: '#E8DCC8' }}><span style={{ fontWeight: 800 }}>VOCAL</span><span style={{ fontWeight: 300, color: '#C6A75E' }}>ARMOR</span></span>
           </div>
           <div style={{ display: 'flex', gap: '32px' }}>
@@ -159,31 +310,40 @@ export default function LandingPage() {
           </div>
           <div style={{ display: 'flex', gap: '10px' }}>
             {user ? (
-              <button className="bp" onClick={() => navigate('/')}>Dashboard</button>
+              <button className="bp" onClick={() => handleTransitionNavigate('/')}>Dashboard</button>
             ) : (
               <>
-                <button className="bg" onClick={() => navigate('/login')}>Log In</button>
-                <button className="bp" onClick={() => navigate('/login')}>Sign Up</button>
+                <button className="bg" onClick={() => handleTransitionNavigate('/login')}>Log In</button>
+                <button className="bp" onClick={() => handleTransitionNavigate('/login')}>Sign Up</button>
               </>
             )}
           </div>
         </nav>
 
-        <section id="hero" style={{ minHeight: '90vh', display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', textAlign: 'center', padding: '80px 6% 60px' }}>
-          <h1 className="hero-title">
-            DETECT AI <span style={{ color: '#A63A3F' }}>VOICES</span>
-            <br />
-            BEFORE THEY{" "}
-            <span style={{ color: '#C6A75E', textShadow: "0 0 60px rgba(198,167,94,0.5)" }}>
-              DECEIVE
-            </span>
-          </h1>
-          <p className="hero-subtitle" style={{ fontSize: '12px', marginBottom: '32px' }}>
-            Real-time deepfake voice detection via spectrogram analysis.
-            <br />
-            Upload any audio — get a verdict in under 2 seconds.
-          </p>
-          <button className="bp" style={{ padding: '13px 32px', fontSize: '15px' }} onClick={() => navigate(user ? '/' : '/login')}>Get Started Free →</button>
+        {/* ── LEFT-ALIGNED HERO WITH DIAGONAL CANVAS SECTION ── */}
+        <section id="hero" style={{ minHeight: '90vh', display: 'flex', alignItems: 'center', justifyContent: 'flex-start', padding: '80px 8% 60px', position: 'relative', overflow: 'hidden' }}>
+          
+          {/* Diagonal Animated Waveform background inside the hero section */}
+          <div style={{ position: 'absolute', top: 0, left: 0, right: 0, bottom: 0, zIndex: 1, pointerEvents: 'none', overflow: 'hidden' }}>
+            <DiagonalWaveform />
+          </div>
+
+          <div style={{ maxWidth: '680px', textAlign: 'left', display: 'flex', flexDirection: 'column', alignItems: 'flex-start', zIndex: 10 }}>
+            <h1 className="hero-title" style={{ textAlign: 'left', fontSize: 'clamp(65px, 7.8vw, 100px)', lineHeight: '1.02', marginBottom: '24px', letterSpacing: '1px' }}>
+              DETECT AI <span style={{ color: '#A63A3F', WebkitTextStroke: '1px #3d6e6a' }}>VOICES</span>
+              <br />
+              BEFORE THEY{" "}
+              <span style={{ color: '#C6A75E', textShadow: "0 0 60px rgba(198,167,94,0.5)", WebkitTextStroke: '1px #3d6e6a' }}>
+                DECEIVE
+              </span>
+            </h1>
+            <p className="hero-subtitle" style={{ fontSize: '15px', color: 'var(--muted)', margin: '0 0 36px 0', textAlign: 'left', lineHeight: '1.6', maxWidth: '540px' }}>
+              Real-time deepfake voice detection via spectrogram analysis.
+              <br />
+              Upload any audio — get a verdict in under 2 seconds.
+            </p>
+            <button className="get-started-btn" style={{ padding: '15px 36px', fontSize: '15px' }} onClick={() => handleTransitionNavigate(user ? '/' : '/login')}>Get Started Free →</button>
+          </div>
         </section>
 
         {/* ── HOW IT WORKS ── */}
@@ -250,7 +410,7 @@ export default function LandingPage() {
             {/* Bottom Row */}
             <div style={{ display: 'flex', flexWrap: 'wrap', gap: '20px' }}>
               
-              <div className="bento-dark" style={{ flex: '5 1 350px', minHeight: '320px', background: 'linear-gradient(135deg, rgba(198,167,94,0.9), rgba(31,42,68,0.9))', border: 'none', color: '#E8DCC8', boxShadow: '0 15px 40px rgba(0,0,0,0.4)' }}>
+              <div className="bento-dark" style={{ flex: '5 1 350px', minHeight: '320px', background: 'linear-gradient(135deg, rgba(198,167,94,0.9), rgba(21,20,18,0.9))', border: 'none', color: '#E8DCC8', boxShadow: '0 15px 40px rgba(0,0,0,0.4)' }}>
                 <div className="num-circle-dark" style={{ color: '#E8DCC8' }}>03</div>
                 <h3 style={{ ...S.syne, fontSize: '18px', fontWeight: 700, letterSpacing: '0.02em', marginBottom: '16px', textTransform: 'uppercase', color: '#E8DCC8' }}>Batch Processing Pipeline</h3>
                 <p style={{ ...S.epi, fontSize: '14px', color: '#E8DCC8', lineHeight: 1.7, fontWeight: 500 }}>
@@ -273,7 +433,7 @@ export default function LandingPage() {
         </section>
         {/* ── CTA ── */}
         <section className="fu" style={{ padding: '0 6% 100px', display: 'flex', justifyContent: 'center' }}>
-          <button className="bp" style={{ padding: '16px 48px', fontSize: '18px', boxShadow: '0 10px 30px rgba(29,207,207,0.2)' }} onClick={() => navigate(user ? '/' : '/login')}>
+          <button className="get-started-btn" style={{ padding: '16px 48px', fontSize: '18px' }} onClick={() => handleTransitionNavigate(user ? '/' : '/login')}>
             Get Started Free →
           </button>
         </section>

@@ -211,12 +211,12 @@ const Dashboard = () => {
       {/* ── Hero ── */}
       <div className="hero-section">
         <h1 className="hero-title">
-          DETECT AI <span className="text-marie">VOICES</span>
+          DETECT AI <span className="text-marie" style={{ WebkitTextStroke: '1px #3d6e6a' }}>VOICES</span>
           <br />
           BEFORE THEY{" "}
           <span
             className="val-cyan"
-            style={{ textShadow: "0 0 60px rgba(123,157,174,0.5)" }}
+            style={{ textShadow: "0 0 60px rgba(123,157,174,0.5)", WebkitTextStroke: '1px #3d6e6a' }}
           >
             DECEIVE
           </span>
@@ -229,7 +229,7 @@ const Dashboard = () => {
       </div>
 
       {/* ── Upload Container ── */}
-      <div className="upload-container">
+      <div className="upload-container" style={{ width: "100%", maxWidth: "980px", padding: "36px", boxSizing: "border-box" }}>
         <ModelSelector
           selectedModel={selectedModel}
           onModelChange={setSelectedModel}
@@ -308,7 +308,7 @@ const Dashboard = () => {
               onDragLeave={handleDrag}
               onDragOver={handleDrag}
               onDrop={handleDrop}
-              style={{ cursor: "pointer" }}
+              style={{ cursor: "pointer", padding: "85px 20px" }}
             >
               <div className="upload-icon-wrapper">
                 <i className="ti ti-cloud-upload"></i>

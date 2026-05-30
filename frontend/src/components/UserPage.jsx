@@ -59,7 +59,8 @@ const UserPage = () => {
     
     // 2. Save profile data to backend
     try {
-      const res = await fetch('http://localhost:8000/users/me', {
+      const apiUrl = import.meta.env.VITE_API_URL || 'http://localhost:8000';
+      const res = await fetch(`${apiUrl}/users/me`, {
         method: 'PUT',
         headers: {
           'Content-Type': 'application/json',
@@ -96,7 +97,8 @@ const UserPage = () => {
     formData.append('file', file);
 
     try {
-      const res = await fetch('http://localhost:8000/users/me/avatar', {
+      const apiUrl = import.meta.env.VITE_API_URL || 'http://localhost:8000';
+      const res = await fetch(`${apiUrl}/users/me/avatar`, {
         method: 'POST',
         headers: {
           'Authorization': `Bearer ${accessToken}`
@@ -124,7 +126,7 @@ const UserPage = () => {
   };
 
   return (
-    <div className="dashboard" style={{ paddingBottom: '100px' }}>
+    <div className="dashboard" style={{ paddingBottom: '20px' }}>
       
 
 
@@ -285,7 +287,7 @@ const UserPage = () => {
             </div>
           </div>
 
-          <button onClick={handleSave} style={{ background: isSaving ? '#211816' : 'linear-gradient(90deg, #E8DCC8, #1F2A44)', color: isSaving ? '#C6A75E' : '#1F2A44', border: isSaving ? '1px solid rgba(123,157,174,0.5)' : '1px solid rgba(198,167,94,0.5)', borderRadius: '50px', padding: '16px 24px', cursor: 'pointer', fontWeight: 700, letterSpacing: '1px', boxShadow: isSaving ? 'none' : '0 8px 32px rgba(0,0,0,0.3)', width: '100%', marginTop: 'auto', transition: 'all 0.3s cubic-bezier(0.25, 0.8, 0.25, 1)', display: 'flex', justifyContent: 'center', alignItems: 'center', gap: '8px' }} disabled={isSaving}>
+          <button onClick={handleSave} style={{ background: isSaving ? '#211816' : 'linear-gradient(90deg, #E8DCC8, #C6A75E)', color: isSaving ? '#C6A75E' : '#151412', border: isSaving ? '1px solid rgba(198,167,94,0.3)' : '1px solid rgba(198,167,94,0.5)', borderRadius: '50px', padding: '16px 24px', cursor: 'pointer', fontWeight: 700, letterSpacing: '1px', boxShadow: isSaving ? 'none' : '0 8px 32px rgba(0,0,0,0.3)', width: '100%', marginTop: 'auto', transition: 'all 0.3s cubic-bezier(0.25, 0.8, 0.25, 1)', display: 'flex', justifyContent: 'center', alignItems: 'center', gap: '8px' }} disabled={isSaving}>
             {isSaving ? <><i className="ti ti-loader" style={{ animation: 'spin 1s linear infinite' }}></i> SAVING CHANGES...</> : 'SAVE ALL CHANGES'}
           </button>
 

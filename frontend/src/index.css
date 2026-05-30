@@ -3,8 +3,8 @@
 
 :root {
   /* ── Core Backgrounds ── */
-  --bg-main:    #1F2A44;       /* Navy Background */
-  --bg-sidebar: #172036;       /* Slightly darker Navy Sidebar/Navbar */
+  --bg-main:    #1E1D1B;       /* Charcoal Background */
+  --bg-sidebar: #151412;       /* Slightly darker Charcoal Sidebar/Navbar */
   --bg-card:    transparent;   /* Transparent containers */
 
   /* ── Borders ── */
@@ -29,8 +29,8 @@
   --marie-dim:      rgba(166, 58, 63, 0.10);
   --marie-border:   rgba(166, 58, 63, 0.25);
 
-  /* ── Dark Navy Accent (for button text) ── */
-  --cream: #1F2A44;
+  /* ── Dark Charcoal Accent (for button text) ── */
+  --cream: #151412;
 }
 
 * {
@@ -95,7 +95,7 @@ h3,
   display: flex;
   align-items: center;
   padding: 0 22px;
-  border-bottom: 1px solid var(--border-color);
+  border-bottom: 1px solid var(--border-nav);
   gap: 16px;
   width: 100%;
   transition: padding 0.3s;
@@ -255,7 +255,7 @@ h3,
   align-items: center;
   justify-content: space-between;
   padding: 0 40px;
-  background: rgba(23, 32, 54, 0.92);
+  background: rgba(21, 20, 18, 0.92);
   backdrop-filter: blur(24px);
   position: sticky;
   top: 0;
@@ -506,15 +506,17 @@ h3,
   color: var(--text-card);
   border: 1px solid var(--border-color);
   border-radius: 20px;
-  padding: 28px;
-  max-width: 750px;
+  padding: 36px;
+  width: 100%;
+  max-width: 980px; /* Expands width close to the dashboard boundary */
   margin: 0 auto 40px;
   box-shadow: 0 4px 20px rgba(0,0,0,0.3);
+  box-sizing: border-box;
 }
 .upload-zone {
   border: 1px dashed var(--nordic-border);
   border-radius: 14px;
-  padding: 60px 20px;
+  padding: 85px 20px; /* Expands height for a highly spacious drop area */
   text-align: center;
   background: var(--nordic-dim);
   margin-bottom: 16px;
@@ -698,7 +700,7 @@ h3,
   font-size: 72px;
   font-weight: 800;
   font-family: "Bebas Neue", "Space Grotesk", sans-serif;
-  background: linear-gradient(135deg, var(--accent-nordic), var(--cream));
+  background: linear-gradient(135deg, var(--accent-nordic), var(--text-main));
   -webkit-background-clip: text;
   -webkit-text-fill-color: transparent;
   line-height: 1;

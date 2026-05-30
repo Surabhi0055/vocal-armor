@@ -105,7 +105,8 @@ const BatchUploadPage = () => {
       formData.append('model', selectedModel);
 
       try {
-        const response = await fetch('http://localhost:8000/predict', {
+        const apiUrl = import.meta.env.VITE_API_URL || 'http://localhost:8000';
+        const response = await fetch(`${apiUrl}/predict`, {
           method: 'POST',
           body: formData,
         });
@@ -148,7 +149,7 @@ const BatchUploadPage = () => {
   const errorCount = results.filter(r => r.error).length;
 
   return (
-    <div className="dashboard" style={{ paddingBottom: '100px' }}>
+    <div className="dashboard" style={{ paddingBottom: '20px' }}>
       
 
 

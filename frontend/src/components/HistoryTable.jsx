@@ -145,7 +145,7 @@ const HistoryTable = () => {
       
       {/* Header Row */}
       <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '24px' }}>
-        <h2 style={{ fontSize: '18px', margin: 0, display: 'flex', alignItems: 'center', gap: '8px' }}>
+        <h2 style={{ fontSize: '18px', margin: 0, display: 'flex', alignItems: 'center', gap: '8px', color: '#3d6e6a', letterSpacing: '1px' }}>
           <i className="ti ti-history"></i> ANALYSIS HISTORY
         </h2>
         <div style={{ display: 'flex', gap: '12px' }}>
@@ -255,7 +255,6 @@ const HistoryTable = () => {
             <tr style={{ background: 'rgba(232,220,200,0.3)', color: 'var(--text-muted)', borderBottom: '1px solid rgba(232,220,200,0.08)' }}>
               <th style={{ padding: '12px 16px', fontWeight: 600 }}>#</th>
               <th style={{ padding: '12px 16px', fontWeight: 600 }}>Filename / URL</th>
-              <th style={{ padding: '12px 16px', fontWeight: 600, textAlign: 'center' }}>Source</th>
               <th onClick={() => toggleSort('Verdict')} style={{ padding: '12px 16px', fontWeight: 600, cursor: 'pointer', userSelect: 'none' }}>
                 Verdict <SortIcon col="Verdict" />
               </th>
@@ -274,7 +273,7 @@ const HistoryTable = () => {
               // Skeleton rows
               Array.from({ length: 5 }).map((_, i) => (
                 <tr key={`skel-${i}`} style={{ borderBottom: '1px solid rgba(232,220,200,0.05)' }}>
-                  <td colSpan={8} style={{ padding: '16px' }}>
+                  <td colSpan={7} style={{ padding: '16px' }}>
                     <div style={{ height: '20px', background: 'rgba(232,220,200,0.05)', borderRadius: '4px', animation: 'pulse 1.5s infinite' }}></div>
                   </td>
                 </tr>
@@ -282,7 +281,7 @@ const HistoryTable = () => {
             ) : currentData.length === 0 ? (
               // Empty State
               <tr>
-                <td colSpan={8} style={{ padding: '60px 20px', textAlign: 'center', color: 'var(--text-muted)' }}>
+                <td colSpan={7} style={{ padding: '60px 20px', textAlign: 'center', color: 'var(--text-muted)' }}>
                   <i className="ti ti-waveform" style={{ fontSize: '48px', opacity: 0.3, marginBottom: '16px', display: 'block' }}></i>
                   <div style={{ fontSize: '16px', color: 'var(--text-card)', marginBottom: '8px' }}>No analyses found.</div>
                   <div>Adjust your filters or upload a voice file to get started.</div>
@@ -291,19 +290,14 @@ const HistoryTable = () => {
             ) : (
               currentData.map((row, i) => {
                 const isFake = row.prediction === 'FAKE';
-                const badgeStyle = isFake 
-                  ? { background: 'rgba(122,46,50,0.15)', border: '1px solid rgba(122,46,50,0.4)', color: '#A63A3F' }
-                  : { background: 'rgba(123,157,174,0.15)', border: '1px solid rgba(123,157,174,0.4)', color: '#C6A75E' };
-                  
                 const displayFile = row.filename.length > 30 ? row.filename.substring(0, 30) + '...' : row.filename;
                 
                 return (
                   <tr key={row.id} className="history-row" style={{ borderBottom: '1px solid rgba(232,220,200,0.05)', background: i % 2 === 0 ? 'transparent' : 'rgba(232,220,200,0.02)', transition: 'background 0.2s' }}>
                     <td style={{ padding: '12px 16px', color: 'var(--text-muted)' }}>{(page - 1) * rowsPerPage + i + 1}</td>
                     <td style={{ padding: '12px 16px' }} title={row.filename}>{displayFile}</td>
-                    <td style={{ padding: '12px 16px', textAlign: 'center', color: 'var(--text-muted)', fontSize: '16px' }}>{getSourceIcon(row.source)}</td>
                     <td style={{ padding: '12px 16px' }}>
-                      <span style={{ padding: '4px 10px', borderRadius: '100px', fontSize: '11px', fontWeight: 700, letterSpacing: '1px', ...badgeStyle }}>
+                      <span style={{ fontSize: '12px', fontWeight: 700, letterSpacing: '1.5px', color: isFake ? '#A63A3F' : '#C6A75E' }}>
                         {row.prediction}
                       </span>
                     </td>

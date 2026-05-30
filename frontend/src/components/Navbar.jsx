@@ -47,11 +47,9 @@ const Navbar = () => {
   // Load real notifications from history
   const loadNotifications = () => {
     const hist = getHistory();
-    // Get recent deepfake detections
-    const fakes = hist.filter(h => h.prediction === 'FAKE');
-    // Sort descending by timestamp
-    fakes.sort((a, b) => new Date(b.timestamp).getTime() - new Date(a.timestamp).getTime());
-    setNotifications(fakes.slice(0, 5)); // top 5
+    // Sort descending by timestamp to show the most recent scans
+    const sorted = [...hist].sort((a, b) => new Date(b.timestamp).getTime() - new Date(a.timestamp).getTime());
+    setNotifications(sorted.slice(0, 5)); // top 5
   };
 
   useEffect(() => {
@@ -181,7 +179,7 @@ const Navbar = () => {
           </button>
           
           {showNotifications && (
-            <div className="dropdown-menu" style={{ position: 'absolute', top: '50px', right: '0', width: '300px', background: '#211816', border: '1px solid rgba(255,255,255,0.08)', borderRadius: '14px', boxShadow: '0 10px 40px rgba(232,220,200,0.6)', zIndex: 100, overflow: 'hidden' }}>
+            <div className="dropdown-menu" style={{ position: 'absolute', top: '50px', right: '0', width: '300px', background: '#211816', border: '1px solid rgba(255,255,255,0.08)', borderRadius: '14px', boxShadow: '0 12px 40px rgba(198, 167, 94, 0.35)', zIndex: 100, overflow: 'hidden' }}>
               <div style={{ padding: '16px', borderBottom: '1px solid rgba(255,255,255,0.05)', fontSize: '14px', fontWeight: 600, color: 'var(--text-main)', display: 'flex', justifyContent: 'space-between' }}>
                 <span>Notifications</span>
                 <span style={{ fontSize: '11px', background: 'rgba(123,157,174,0.12)', color: '#C6A75E', padding: '2px 8px', borderRadius: '100px' }}>{notifications.length} New</span>
@@ -194,21 +192,24 @@ const Navbar = () => {
                     No recent deepfake alerts.
                   </div>
                 ) : (
-                  notifications.map((notif, idx) => (
-                    <div style={{ padding: '16px', borderBottom: '1px solid rgba(255,255,255,0.05)', display: 'flex', gap: '12px', background: 'rgba(122,46,50,0.06)' }}>
-                      <div style={{ width: '8px', height: '8px', borderRadius: '50%', background: '#A63A3F', marginTop: '6px', flexShrink: 0, boxShadow: '0 0 8px rgba(122,46,50,0.7)' }}></div>
-                      <div style={{ overflow: 'hidden' }}>
-                        <div style={{ fontSize: '13px', color: 'var(--text-main)', marginBottom: '4px', display: 'flex', justifyContent: 'space-between' }}>
-                          <span style={{ fontWeight: 600 }}>Deepfake Detected</span>
-                          <span style={{ color: '#A63A3F', fontWeight: 600 }}>{notif.confidence.toFixed(1)}%</span>
+                  notifications.map((notif, idx) => {
+                    const isFake = notif.prediction === 'FAKE';
+                    return (
+                      <div key={idx} style={{ padding: '16px', borderBottom: '1px solid rgba(255,255,255,0.05)', display: 'flex', gap: '12px', background: isFake ? 'rgba(122,46,50,0.06)' : 'rgba(198,167,94,0.03)' }}>
+                        <div style={{ width: '8px', height: '8px', borderRadius: '50%', background: isFake ? '#A63A3F' : '#C6A75E', marginTop: '6px', flexShrink: 0, boxShadow: isFake ? '0 0 8px rgba(122,46,50,0.7)' : '0 0 8px rgba(198,167,94,0.5)' }}></div>
+                        <div style={{ overflow: 'hidden', flex: 1 }}>
+                          <div style={{ fontSize: '13px', color: 'var(--text-main)', marginBottom: '4px', display: 'flex', justifyContent: 'space-between', gap: '8px' }}>
+                            <span style={{ fontWeight: 600 }}>{isFake ? 'Deepfake Detected' : 'Voice Verified'}</span>
+                            <span style={{ color: isFake ? '#A63A3F' : '#C6A75E', fontWeight: 600 }}>{notif.confidence.toFixed(1)}%</span>
+                          </div>
+                          <div style={{ fontSize: '11px', color: 'var(--text-muted)', whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>
+                            {notif.filename}
+                          </div>
+                          <div style={{ fontSize: '10px', color: 'rgba(255,255,255,0.3)', marginTop: '8px' }}>{timeAgo(notif.timestamp)}</div>
                         </div>
-                        <div style={{ fontSize: '11px', color: 'var(--text-muted)', whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>
-                          {notif.filename}
-                        </div>
-                        <div style={{ fontSize: '10px', color: 'rgba(255,255,255,0.3)', marginTop: '8px' }}>{timeAgo(notif.timestamp)}</div>
                       </div>
-                    </div>
-                  ))
+                    );
+                  })
                 )}
               </div>
               
@@ -256,7 +257,7 @@ const Navbar = () => {
           </button>
 
           {showProfileMenu && (
-            <div className="dropdown-menu" style={{ position: 'absolute', top: '50px', right: '0', width: '200px', background: '#211816', border: '1px solid rgba(255,255,255,0.08)', borderRadius: '14px', boxShadow: '0 10px 40px rgba(232,220,200,0.6)', zIndex: 100, overflow: 'hidden', display: 'flex', flexDirection: 'column' }}>
+            <div className="dropdown-menu" style={{ position: 'absolute', top: '50px', right: '0', width: '200px', background: '#211816', border: '1px solid rgba(255,255,255,0.08)', borderRadius: '14px', boxShadow: '0 12px 40px rgba(198, 167, 94, 0.35)', zIndex: 100, overflow: 'hidden', display: 'flex', flexDirection: 'column' }}>
               <Link to="/user" style={{ padding: '12px 16px', color: 'var(--text-main)', textDecoration: 'none', fontSize: '13px', display: 'flex', alignItems: 'center', gap: '8px', transition: 'background 0.2s' }} onMouseOver={(e) => e.target.style.background = 'rgba(255,255,255,0.05)'} onMouseOut={(e) => e.target.style.background = 'transparent'}>
                 <i className="ti ti-user" style={{ fontSize: '16px', color: 'var(--text-muted)' }}></i> My Profile
               </Link>

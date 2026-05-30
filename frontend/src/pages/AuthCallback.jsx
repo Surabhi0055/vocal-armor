@@ -16,7 +16,8 @@ export default function AuthCallback() {
       setTokens(access, refresh);
 
       // Fetch user info
-      fetch("http://localhost:8000/auth/me", {
+      const apiUrl = import.meta.env.VITE_API_URL || 'http://localhost:8000';
+      fetch(`${apiUrl}/auth/me`, {
         headers: { Authorization: `Bearer ${access}` },
       })
         .then((r) => r.json())

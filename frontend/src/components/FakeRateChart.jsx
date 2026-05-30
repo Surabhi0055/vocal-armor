@@ -112,10 +112,7 @@ const FakeRateChart = () => {
       <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(200px, 1fr))', gap: '20px', marginBottom: '24px' }}>
         
         {/* Total */}
-        <div style={{ background: 'var(--bg-card)', border: '1px solid rgba(232,220,200,0.08)', borderRadius: '16px', padding: '20px', display: 'flex', alignItems: 'center', gap: '16px' }}>
-          <div style={{ width: 48, height: 48, borderRadius: '50%', background: 'rgba(123,157,174,0.1)', color: '#C6A75E', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: 24 }}>
-            <i className="ti ti-waveform"></i>
-          </div>
+        <div style={{ background: 'var(--bg-card)', border: '1px solid rgba(232,220,200,0.08)', borderRadius: '16px', padding: '20px 24px', display: 'flex', alignItems: 'center' }}>
           <div>
             <div style={{ fontSize: '32px', fontWeight: 800, color: '#C6A75E', lineHeight: 1 }}>
               <AnimatedNumber value={stats.total} />

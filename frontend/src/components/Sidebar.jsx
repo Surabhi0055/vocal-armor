@@ -54,13 +54,13 @@ const Sidebar = () => {
         </a>
         
         {/* Profile Details Card */}
-        <div style={{ width: '100%', overflow: 'hidden', padding: '16px 0 0 0', borderTop: '1px solid rgba(255,255,255,0.05)', display: 'flex', flexDirection: 'column', alignItems: 'center' }}>
+        <div style={{ width: '100%', flexShrink: 0, overflow: 'hidden', padding: '16px 0 0 0', borderTop: '1px solid rgba(198, 167, 94, 0.2)', display: 'flex', flexDirection: 'column', alignItems: 'center' }}>
           
-          <div onClick={() => navigate('/user')} style={{ display: 'flex', alignItems: 'center', gap: '12px', background: 'rgba(255,255,255,0.02)', border: '1px solid rgba(255,255,255,0.05)', padding: '6px', borderRadius: '30px', width: '90%', transition: 'all 0.3s', cursor: 'pointer', overflow: 'hidden' }}>
+          <div onClick={() => navigate('/user')} className="side-icon-box" style={{ paddingLeft: '5px', gap: '12px', background: 'rgba(198, 167, 94, 0.05)', border: '1px solid rgba(198, 167, 94, 0.3)', borderRadius: '30px', flexShrink: 0, marginTop: '8px', boxShadow: '0 4px 15px rgba(0,0,0,0.2)' }}>
             {user?.avatar_url ? (
-              <img src={user.avatar_url} alt="Profile" style={{ minWidth: '36px', height: '36px', borderRadius: '50%', objectFit: 'cover', boxShadow: '0 4px 10px rgba(232,220,200,0.3)', flexShrink: 0 }} />
+              <img src={user.avatar_url} alt="Profile" style={{ minWidth: '36px', minHeight: '36px', width: '36px', height: '36px', borderRadius: '50%', objectFit: 'cover', boxShadow: '0 4px 10px rgba(198,167,94,0.3)', flexShrink: 0 }} />
             ) : (
-              <div style={{ minWidth: '36px', height: '36px', borderRadius: '50%', background: 'linear-gradient(135deg, #C6A75E, #7A2E32)', display: 'flex', alignItems: 'center', justifyContent: 'center', fontWeight: 800, fontSize: '14px', color: 'var(--text-main)', fontFamily: '"Bebas Neue", sans-serif', letterSpacing: '1px', boxShadow: '0 4px 10px rgba(232,220,200,0.3)', flexShrink: 0 }}>
+              <div style={{ minWidth: '36px', minHeight: '36px', width: '36px', height: '36px', borderRadius: '50%', background: 'linear-gradient(135deg, #E8DCC8, #C6A75E)', display: 'flex', alignItems: 'center', justifyContent: 'center', fontWeight: 800, fontSize: '14px', color: '#151412', fontFamily: '"Bebas Neue", sans-serif', letterSpacing: '1px', boxShadow: '0 4px 10px rgba(198,167,94,0.3)', flexShrink: 0 }}>
                 {initials}
               </div>
             )}

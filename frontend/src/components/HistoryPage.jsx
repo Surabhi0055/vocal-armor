@@ -67,7 +67,7 @@ const HistoryPage = () => {
   }, [loadQuickStats]);
 
   return (
-    <div className="dashboard" style={{ paddingBottom: '100px' }}>
+    <div className="dashboard" style={{ paddingBottom: '20px' }}>
 
 
 

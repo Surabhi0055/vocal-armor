@@ -217,14 +217,18 @@ const LiveMonitorPage = () => {
       return;
     }
 
-    // Check if it's mostly silence (no voice detected)
+    // Check if it's mostly silence (no voice detected) using RMS and max amplitude
     let maxAmp = 0;
+    let sumSq = 0;
     for (let i = 0; i < samples.length; i++) {
-      const abs = Math.abs(samples[i]);
+      const val = samples[i];
+      const abs = Math.abs(val);
       if (abs > maxAmp) maxAmp = abs;
+      sumSq += val * val;
     }
+    const rms = Math.sqrt(sumSq / samples.length);
 
-    if (maxAmp < 0.02) {
+    if (rms < 0.01 || maxAmp < 0.05) {
       setStatus('error');
       setErrorMsg('No voice detected. Please speak clearly into the microphone.');
       return;
@@ -246,7 +250,8 @@ const LiveMonitorPage = () => {
       );
 
       // Send to regular POST /predict endpoint — no WebSocket needed
-      const response = await fetch('http://localhost:8000/predict', {
+      const apiUrl = import.meta.env.VITE_API_URL || 'http://localhost:8000';
+      const response = await fetch(`${apiUrl}/predict`, {
         method: 'POST',
         body: formData,
       });
@@ -309,7 +314,7 @@ const LiveMonitorPage = () => {
     : '0 0 32px rgba(123,157,174,0.5)';
 
   return (
-    <div className="dashboard" style={{ paddingBottom: '100px' }}>
+    <div className="dashboard" style={{ paddingBottom: '20px' }}>
 
 
 

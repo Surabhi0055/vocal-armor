@@ -57,7 +57,8 @@ export default function AuthPage() {
     e.preventDefault(); setFormError('');
     if (!email) return setFormError('Please enter your email');
     try {
-      const res = await fetch('http://localhost:8000/auth/forgot-password', {
+      const apiUrl = import.meta.env.VITE_API_URL || 'http://localhost:8000';
+      const res = await fetch(`${apiUrl}/auth/forgot-password`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ email }),
@@ -75,14 +76,15 @@ export default function AuthPage() {
   const handleGoogleLogin = () => {
     if (oauthLoading) return;
     setOauthLoading(true);
-    window.location.href = 'http://localhost:8000/auth/google';
+    const apiUrl = import.meta.env.VITE_API_URL || 'http://localhost:8000';
+    window.location.href = `${apiUrl}/auth/google`;
   };
 
   const switchMode = (m) => { setMode(m); setFormError(''); setForgotSent(false); clearError(); };
 
   const inp = {
     width:'100%', boxSizing:'border-box',
-    background:'rgba(31,42,68,0.6)',
+    background:'rgba(0,0,0,0.25)',
     border:'1px solid rgba(232,220,200,0.3)',
     borderRadius:'12px', padding:'12px 14px',
     fontSize:'14px', color:'#E8DCC8', fontFamily:'"Syne", sans-serif',
@@ -91,12 +93,12 @@ export default function AuthPage() {
   };
   
   const fi = ev => { 
-    ev.target.style.background='rgba(31,42,68,0.9)'; 
+    ev.target.style.background='rgba(0,0,0,0.4)'; 
     ev.target.style.borderColor='#C6A75E'; 
     ev.target.style.boxShadow='0 0 15px rgba(198,167,94,0.15)'; 
   };
   const fo = ev => { 
-    ev.target.style.background='rgba(31,42,68,0.6)'; 
+    ev.target.style.background='rgba(0,0,0,0.25)'; 
     ev.target.style.borderColor='rgba(232,220,200,0.3)'; 
     ev.target.style.boxShadow='none'; 
   };
@@ -125,7 +127,7 @@ export default function AuthPage() {
     input:-webkit-autofill:hover, 
     input:-webkit-autofill:focus, 
     input:-webkit-autofill:active{
-        -webkit-box-shadow: 0 0 0 30px #1F2A44 inset !important;
+        -webkit-box-shadow: 0 0 0 30px #151412 inset !important;
         -webkit-text-fill-color: #E8DCC8 !important;
         transition: background-color 5000s ease-in-out 0s;
     }
@@ -139,10 +141,10 @@ export default function AuthPage() {
       font-weight: 700;
       letter-spacing: 0.06em;
       text-transform: uppercase;
-      color: #1F2A44;
+      color: #1E1D1B;
       border-radius: 50px;
       
-      background: linear-gradient(90deg, #E8DCC8, #1F2A44);
+      background: linear-gradient(90deg, #E8DCC8, #C6A75E);
       border: 1px solid rgba(198,167,94,0.5);
       backdrop-filter: blur(16px);
       -webkit-backdrop-filter: blur(16px);
@@ -153,7 +155,7 @@ export default function AuthPage() {
     }
     
     .bounce-btn:hover:not(:disabled) {
-      background: linear-gradient(90deg, #C6A75E, #1F2A44);
+      background: linear-gradient(90deg, #C6A75E, #A38A4B);
       border-color: rgba(232,220,200,0.4);
       box-shadow: 0 12px 40px rgba(0,0,0,0.4), inset 0 0 20px rgba(232,220,200,0.06);
       transform: scale(1.03) translateY(-2px);
@@ -161,6 +163,20 @@ export default function AuthPage() {
     
     .bounce-btn:active:not(:disabled) {
       transform: scale(0.97) translateY(2px);
+    }
+
+    .slide-in-right {
+      animation: slideInRight 0.7s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+    }
+    @keyframes slideInRight {
+      0% {
+        transform: translateX(100vw);
+        opacity: 0;
+      }
+      100% {
+        transform: translateX(0);
+        opacity: 1;
+      }
     }
   `;
 
@@ -176,7 +192,7 @@ export default function AuthPage() {
   return (
     <>
       <style>{stylesOverride}</style>
-      <div style={{ width:'100vw', height:'100vh', background:'#1F2A44',
+      <div style={{ width:'100vw', height:'100vh', background:'var(--bg-main)',
         display:'flex', alignItems:'center', justifyContent:'center',
         fontFamily:'"Syne", sans-serif', overflow:'hidden', position:'relative' }}>
 
@@ -197,7 +213,7 @@ export default function AuthPage() {
           pointerEvents: 'none', zIndex: 1,
         }} />
 
-        <div ref={cardRef} style={{
+        <div ref={cardRef} className="slide-in-right" style={{
           position:'relative', zIndex:10,
           width:'100%', maxWidth:'460px', margin:'16px',
           background:'rgba(198,167,94,0.05)',

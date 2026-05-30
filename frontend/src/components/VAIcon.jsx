@@ -19,7 +19,6 @@ const VAIcon = ({ size = 28, className = '', style = {} }) => (
       objectFit: 'cover',
       display: 'inline-block',
       flexShrink: 0,
-      filter: 'hue-rotate(-138deg)',
       ...style,
     }}
   />

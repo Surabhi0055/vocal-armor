@@ -62,25 +62,26 @@ export default function ResetPasswordPage() {
 
   const inp = {
     width: '100%', boxSizing: 'border-box',
-    background: 'rgba(255,255,255,0.03)',
-    border: '1px solid rgba(255,255,255,0.15)',
+    background: 'rgba(0,0,0,0.25)',
+    border: '1px solid rgba(232,220,200,0.3)',
     borderRadius: '12px', padding: '12px 44px 12px 14px',
-    fontSize: '14px', color: '#1A1210', fontFamily: '"Syne", sans-serif',
+    fontSize: '14px', color: '#E8DCC8', fontFamily: '"Syne", sans-serif',
     outline: 'none', transition: 'all 0.3s ease',
+    backdropFilter: 'blur(10px)', WebkitBackdropFilter: 'blur(10px)',
   };
   const fi = ev => {
-    ev.target.style.background = 'rgba(255,255,255,0.08)';
-    ev.target.style.borderColor = 'rgba(29,207,207,0.60)';
-    ev.target.style.boxShadow = '0 0 15px rgba(29,207,207,0.15)';
+    ev.target.style.background = 'rgba(0,0,0,0.4)';
+    ev.target.style.borderColor = '#C6A75E';
+    ev.target.style.boxShadow = '0 0 15px rgba(198,167,94,0.15)';
   };
   const fo = ev => {
-    ev.target.style.background = 'rgba(255,255,255,0.03)';
-    ev.target.style.borderColor = 'rgba(255,255,255,0.15)';
+    ev.target.style.background = 'rgba(0,0,0,0.25)';
+    ev.target.style.borderColor = 'rgba(232,220,200,0.3)';
     ev.target.style.boxShadow = 'none';
   };
   const lbl = {
     display: 'block', fontSize: '11px', fontWeight: 600,
-    color: 'rgba(29,207,207,0.80)', letterSpacing: '0.09em',
+    color: '#E8DCC8', letterSpacing: '0.09em',
     textTransform: 'uppercase', marginBottom: '6px',
   };
 
@@ -93,7 +94,8 @@ export default function ResetPasswordPage() {
 
     setIsLoading(true);
     try {
-      const res = await fetch('http://localhost:8000/auth/reset-password', {
+      const apiUrl = import.meta.env.VITE_API_URL || 'http://localhost:8000';
+      const res = await fetch(`${apiUrl}/auth/reset-password`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ token, new_password: password }),
@@ -123,16 +125,17 @@ export default function ResetPasswordPage() {
       width: 100%; padding: 13px; cursor: pointer;
       font-family: "Syne", sans-serif; font-size: 14px;
       font-weight: 700; letter-spacing: 0.06em; text-transform: uppercase;
-      color: #ffffff; border-radius: 12px;
-      background: linear-gradient(135deg, rgba(122,46,50,0.35) 0%, rgba(29,207,207,0.35) 100%);
-      border: 1px solid rgba(255,255,255,0.3);
+      color: #1E1D1B; border-radius: 50px;
+      background: linear-gradient(90deg, #E8DCC8, #C6A75E);
+      border: 1px solid rgba(198,167,94,0.5);
       backdrop-filter: blur(16px); -webkit-backdrop-filter: blur(16px);
       box-shadow: 0 8px 32px rgba(0,0,0,0.3);
       transition: all 0.3s cubic-bezier(0.25, 0.8, 0.25, 1);
     }
     .reset-btn:hover:not(:disabled) {
-      background: linear-gradient(135deg, rgba(122,46,50,0.5) 0%, rgba(29,207,207,0.5) 100%);
-      box-shadow: 0 12px 40px rgba(0,0,0,0.4), inset 0 0 20px rgba(255,255,255,0.1);
+      background: linear-gradient(90deg, #C6A75E, #A38A4B);
+      border-color: rgba(232,220,200,0.4);
+      box-shadow: 0 12px 40px rgba(0,0,0,0.4), inset 0 0 20px rgba(232,220,200,0.06);
       transform: scale(1.02) translateY(-2px);
     }
     .reset-btn:active:not(:disabled) { transform: scale(0.97) translateY(1px); }
@@ -143,33 +146,33 @@ export default function ResetPasswordPage() {
     <>
       <style>{styles}</style>
       <div style={{
-        width: '100vw', height: '100vh', background: '#1A1210',
+        width: '100vw', height: '100vh', background: 'var(--bg-main)',
         display: 'flex', alignItems: 'center', justifyContent: 'center',
         fontFamily: '"Syne", sans-serif', overflow: 'hidden', position: 'relative',
       }}>
         <WaveformBackground />
 
-        {/* Top cyan gradient */}
+        {/* Top gold/warm gradient */}
         <div style={{
           position: 'absolute', top: 0, left: 0, right: 0, height: '260px',
-          background: 'linear-gradient(180deg, rgba(29,207,207,0.10) 0%, transparent 100%)',
+          background: 'linear-gradient(180deg, rgba(198,167,94,0.09) 0%, transparent 100%)',
           pointerEvents: 'none', zIndex: 1,
         }} />
-        {/* Bottom orange gradient */}
+        {/* Bottom maroon/dim red gradient */}
         <div style={{
           position: 'absolute', bottom: 0, left: 0, right: 0, height: '220px',
-          background: 'linear-gradient(0deg, rgba(122,46,50,0.09) 0%, transparent 100%)',
+          background: 'linear-gradient(0deg, rgba(166,58,63,0.10) 0%, transparent 100%)',
           pointerEvents: 'none', zIndex: 1,
         }} />
 
         <div style={{
           position: 'relative', zIndex: 10,
           width: '100%', maxWidth: '440px', margin: '16px',
-          background: 'rgba(255,255,255,0)',
-          backdropFilter: 'blur(6px)', WebkitBackdropFilter: 'blur(6px)',
-          border: '1px solid rgba(255,255,255,0.15)',
+          background: 'rgba(198,167,94,0.05)',
+          backdropFilter: 'blur(18px)', WebkitBackdropFilter: 'blur(18px)',
+          border: '1px solid rgba(198,167,94,0.3)',
           borderRadius: '24px', padding: '44px 40px 40px',
-          boxShadow: '0 15px 35px rgba(0,0,0,0.2), inset 0 1px 0 rgba(255,255,255,0.1)',
+          boxShadow: '0 20px 50px rgba(0,0,0,0.4)',
         }}>
 
           {/* Lock icon */}
@@ -177,11 +180,11 @@ export default function ResetPasswordPage() {
             <div style={{
               display: 'inline-flex', alignItems: 'center', justifyContent: 'center',
               width: '56px', height: '56px', borderRadius: '16px',
-              background: 'rgba(29,207,207,0.10)',
-              border: '1px solid rgba(29,207,207,0.25)',
+              background: 'rgba(198,167,94,0.10)',
+              border: '1px solid rgba(198,167,94,0.25)',
               marginBottom: '16px',
             }}>
-              <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="#7B9DAE" strokeWidth="2" strokeLinecap="round">
+              <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="#C6A75E" strokeWidth="2" strokeLinecap="round">
                 <rect x="3" y="11" width="18" height="11" rx="2" ry="2"/>
                 <path d="M7 11V7a5 5 0 0 1 10 0v4"/>
               </svg>
@@ -191,8 +194,8 @@ export default function ResetPasswordPage() {
           <div style={{ textAlign: 'center', marginBottom: '28px' }}>
             <h1 style={{
               fontFamily: '"Bebas Neue", sans-serif', fontSize: '38px',
-              letterSpacing: '0.05em', color: '#1A1210', margin: '0 0 6px',
-              textShadow: '0 0 30px rgba(29,207,207,0.30)',
+              letterSpacing: '0.05em', color: '#E8DCC8', margin: '0 0 6px',
+              textShadow: '0 0 30px rgba(198,167,94,0.25)',
             }}>
               New Password
             </h1>
@@ -205,12 +208,12 @@ export default function ResetPasswordPage() {
           {success ? (
             <div style={{ textAlign: 'center' }}>
               <div style={{
-                background: 'rgba(29,207,207,0.07)',
-                border: '1px solid rgba(29,207,207,0.25)',
+                background: 'rgba(198,167,94,0.07)',
+                border: '1px solid rgba(198,167,94,0.25)',
                 borderRadius: '14px', padding: '28px 20px', marginBottom: '20px',
               }}>
                 <div style={{ fontSize: '40px', marginBottom: '12px' }}>✓</div>
-                <p style={{ color: '#7B9DAE', fontWeight: 600, margin: '0 0 6px' }}>
+                <p style={{ color: '#E8DCC8', fontWeight: 600, margin: '0 0 6px' }}>
                   Password updated!
                 </p>
                 <p style={{ fontSize: '13px', color: 'var(--text-muted)', margin: 0 }}>
@@ -229,7 +232,7 @@ export default function ResetPasswordPage() {
 
               {error && (
                 <div style={{
-                  background: 'rgba(122,46,50,0.08)', border: '1px solid rgba(122,46,50,0.25)',
+                  background: 'rgba(166,58,63,0.08)', border: '1px solid rgba(166,58,63,0.25)',
                   borderRadius: '10px', padding: '10px 14px',
                   color: 'rgba(255,138,80,0.90)', fontSize: '13px',
                 }}>
@@ -275,7 +278,7 @@ export default function ResetPasswordPage() {
                         style={{
                           ...inp,
                           borderColor: confirmPassword && confirmPassword !== password
-                            ? 'rgba(122,46,50,0.5)' : undefined,
+                            ? 'rgba(166,58,63,0.5)' : undefined,
                         }}
                         type={showPass ? 'text' : 'password'}
                         placeholder="Repeat password"
@@ -286,7 +289,7 @@ export default function ResetPasswordPage() {
                       {confirmPassword && confirmPassword === password && (
                         <span style={{
                           position: 'absolute', right: '14px', top: '50%',
-                          transform: 'translateY(-50%)', color: '#7B9DAE', fontSize: '16px',
+                          transform: 'translateY(-50%)', color: '#C6A75E', fontSize: '16px',
                         }}>✓</span>
                       )}
                     </div>
@@ -303,7 +306,7 @@ export default function ResetPasswordPage() {
                 onClick={() => navigate('/login')}
                 style={{
                   background: 'none', border: 'none',
-                  color: 'rgba(29,207,207,0.60)', cursor: 'pointer',
+                  color: 'rgba(198,167,94,0.85)', cursor: 'pointer',
                   fontSize: '13px', fontFamily: 'inherit',
                   textAlign: 'center', padding: '4px 0',
                 }}
