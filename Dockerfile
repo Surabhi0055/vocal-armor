@@ -29,4 +29,4 @@ RUN mkdir -p uploads/avatars
 EXPOSE 7860
 
 # ── Start FastAPI Server ───────────────────────────────────────────────────────
-CMD ["uvicorn", "src.app:app", "--host", "0.0.0.0", "--port", "7860"]
+CMD ["uvicorn", "app:app", "--host", "0.0.0.0", "--port", "7860", "--app-dir", "src"]
