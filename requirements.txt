@@ -1,36 +1,36 @@
 # ── Core REST API & Web Server ────────────────────────────────────────────────
-fastapi==0.136.1
-uvicorn==0.46.0
-python-multipart==0.0.27
-httpx==0.28.1
-starlette==0.46.2
+fastapi
+uvicorn
+python-multipart
+httpx
+starlette
 
 # ── Rate Limiting ─────────────────────────────────────────────────────────────
-slowapi==0.1.28
+slowapi
 
 # ── Deep Learning & Machine Learning ─────────────────────────────────────────
-tensorflow==2.21.0
-numpy==2.4.4
-scikit-learn==1.8.0
-pandas==3.0.2
+tensorflow
+numpy
+scikit-learn
+pandas
 
 # ── Audio Processing ──────────────────────────────────────────────────────────
-librosa==0.11.0
-soundfile==0.13.1
-soxr==1.0.0
-pillow==12.2.0
-matplotlib==3.10.9
+librosa
+soundfile
+soxr
+pillow
+matplotlib
 
 # ── Database & Authentication ─────────────────────────────────────────────────
-SQLAlchemy==2.0.28
-psycopg2-binary==2.9.9
-passlib[bcrypt]==1.7.4
-bcrypt==4.1.2
-python-jose[cryptography]==3.3.0
-email-validator==2.2.0
+SQLAlchemy
+psycopg2-binary
+passlib[bcrypt]
+bcrypt
+python-jose[cryptography]
+email-validator
 
 # ── Environment & Configuration ───────────────────────────────────────────────
-python-dotenv==1.0.1
+python-dotenv
 
 # ── Remote Audio Extraction ───────────────────────────────────────────────────
-yt-dlp>=2024.3.10
+yt-dlp
