@@ -1,0 +1,38 @@
+# Git
+.git
+.gitignore
+
+# Python
+__pycache__
+*.pyc
+*.pyo
+venv/
+*.egg-info/
+
+# Local environment (never send secrets to Docker)
+.env
+
+# Dev/notebook files
+notebooks/
+data/
+results/
+
+# macOS
+.DS_Store
+
+# Local SQLite database
+*.db
+vocal_armor.db
+src/vocal_armor.db
+
+# Frontend (not needed in backend Docker image)
+frontend/
+
+# Test scripts
+test_gradcam.py
+test_gradcam_v3.py
+dummy.mp3
+
+# Python scripts only used locally
+frontend/inspect_logo.py
+frontend/shift_hue.py
