@@ -1,5 +1,5 @@
 # ── Base Image ────────────────────────────────────────────────────────────────
-FROM python:3.10-slim
+FROM python:3.12-slim
 
 # ── System Dependencies ────────────────────────────────────────────────────────
 # ffmpeg  → required by yt-dlp for audio extraction from URLs
