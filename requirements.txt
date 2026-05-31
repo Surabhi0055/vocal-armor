@@ -35,3 +35,8 @@ python-dotenv
 # ── Remote Audio Extraction ───────────────────────────────────────────────────
 yt-dlp
 itsdangerous
+
+# ── Google API (Gmail for password reset emails) ──────────────────────────────
+google-api-python-client
+google-auth
+google-auth-httplib2

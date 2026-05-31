@@ -3,7 +3,7 @@ from fastapi.responses import RedirectResponse
 from fastapi.security import OAuth2PasswordRequestForm
 from sqlalchemy.orm import Session
 from datetime import datetime, timedelta
-import os, httpx, smtplib, secrets
+import os, httpx, secrets, json, base64
 from email.mime.multipart import MIMEMultipart
 from email.mime.text import MIMEText
 
@@ -30,12 +30,9 @@ FRONTEND_URL         = os.getenv("FRONTEND_URL", "http://localhost:5173")
 REFRESH_EXPIRE_DAYS  = int(os.getenv("REFRESH_TOKEN_EXPIRE_DAYS", 7))
 RESET_EXPIRE_MINUTES = int(os.getenv("RESET_TOKEN_EXPIRE_MINUTES", 60))
 
-# Gmail SMTP config
-EMAIL_HOST     = os.getenv("EMAIL_HOST", "smtp.gmail.com")
-EMAIL_PORT     = int(os.getenv("EMAIL_PORT", 587))
-EMAIL_USER     = os.getenv("EMAIL_USER", "")
-EMAIL_PASSWORD = os.getenv("EMAIL_APP_PASSWORD", "")
-EMAIL_FROM     = os.getenv("EMAIL_FROM", EMAIL_USER)
+# Gmail API config
+GMAIL_SENDER              = os.getenv("GMAIL_SENDER", "")           # e.g. vocalarmor@gmail.com
+GOOGLE_SERVICE_ACCOUNT_JSON = os.getenv("GOOGLE_SERVICE_ACCOUNT_JSON", "")  # full JSON as string
 
 
 #  Helper 
@@ -163,58 +160,77 @@ def get_me(current_user: User = Depends(get_current_user)):
     return current_user
 
 
-# ─── Email Helper ────────────────────────────────────────────────────────────
+# ─── Gmail API Email Helper ──────────────────────────────────────────────────
 def send_reset_email(to_email: str, reset_url: str) -> None:
-    """Send a password reset email via Gmail SMTP (runs in a background thread)."""
-    if not EMAIL_USER or not EMAIL_PASSWORD:
-        print(f"[EMAIL] SMTP not configured — reset URL: {reset_url}")
+    """Send a password reset email via Gmail API using a service account."""
+    if not GOOGLE_SERVICE_ACCOUNT_JSON or not GMAIL_SENDER:
+        print(f"[EMAIL] Gmail API not configured — reset URL: {reset_url}")
         return
 
-    subject = "VocalArmor — Password Reset Request"
-    html = f"""
-    <html><body style="font-family:sans-serif;background:#050e10;color:#dfe8e6;padding:32px">
-      <div style="max-width:520px;margin:auto;background:#0d1f24;border:1px solid rgba(255,255,255,0.1);
-                  border-radius:16px;padding:40px">
-        <h1 style="font-size:28px;color:#1dcfcf;margin:0 0 8px">VocalArmor</h1>
-        <p style="color:#7ea8a4;margin:0 0 28px;font-size:14px">Deepfake Voice Detection</p>
-        <h2 style="font-size:20px;margin:0 0 16px">Reset your password</h2>
-        <p style="font-size:14px;color:#b0c4c0;line-height:1.6">
-          We received a request to reset the password for your VocalArmor account.
-          Click the button below to choose a new password. This link expires in
-          <strong style="color:#1dcfcf">60 minutes</strong>.
-        </p>
-        <a href="{reset_url}"
-           style="display:inline-block;margin:24px 0;padding:14px 32px;
-                  background:linear-gradient(135deg,rgba(255,92,43,0.8),rgba(29,207,207,0.8));
-                  color:#fff;text-decoration:none;border-radius:10px;
-                  font-weight:700;font-size:14px;letter-spacing:0.05em">
-          Reset Password →
-        </a>
-        <p style="font-size:12px;color:#5a7a76;margin:16px 0 0">
-          If you didn't request this, you can safely ignore this email.
-          Your password will not change.
-        </p>
-        <hr style="border:none;border-top:1px solid rgba(255,255,255,0.08);margin:24px 0">
-        <p style="font-size:11px;color:#3a5a56">VocalArmor Security Team</p>
-      </div>
-    </body></html>
-    """
-
-    msg = MIMEMultipart("alternative")
-    msg["Subject"] = subject
-    msg["From"]    = f"VocalArmor <{EMAIL_FROM}>"
-    msg["To"]      = to_email
-    msg.attach(MIMEText(html, "html"))
-
     try:
-        with smtplib.SMTP(EMAIL_HOST, EMAIL_PORT) as server:
-            server.ehlo()
-            server.starttls()
-            server.login(EMAIL_USER, EMAIL_PASSWORD)
-            server.sendmail(EMAIL_FROM, to_email, msg.as_string())
-        print(f"[EMAIL] Reset email sent to {to_email}")
+        from google.oauth2 import service_account
+        from googleapiclient.discovery import build
+
+        # Parse the service account JSON (stored as env var string)
+        sa_info = json.loads(GOOGLE_SERVICE_ACCOUNT_JSON)
+
+        # Scopes needed to send email as the sender
+        SCOPES = ["https://www.googleapis.com/auth/gmail.send"]
+
+        # Create delegated credentials — the service account impersonates GMAIL_SENDER
+        credentials = service_account.Credentials.from_service_account_info(
+            sa_info, scopes=SCOPES
+        ).with_subject(GMAIL_SENDER)
+
+        service = build("gmail", "v1", credentials=credentials)
+
+        subject = "VocalArmor — Password Reset Request"
+        html = f"""
+        <html><body style="font-family:sans-serif;background:#1E1D1B;color:#E8DCC8;padding:32px">
+          <div style="max-width:520px;margin:auto;background:#2a2825;border:1px solid rgba(198,167,94,0.2);
+                      border-radius:16px;padding:40px">
+            <h1 style="font-size:28px;color:#C6A75E;margin:0 0 4px">VocalArmor</h1>
+            <p style="color:#8a7a60;margin:0 0 28px;font-size:13px;letter-spacing:.05em">DEEPFAKE VOICE DETECTION</p>
+            <h2 style="font-size:20px;margin:0 0 16px;color:#E8DCC8">Reset your password</h2>
+            <p style="font-size:14px;color:#b0a08a;line-height:1.7">
+              We received a request to reset the password for your VocalArmor account.
+              Click the button below to choose a new password. This link expires in
+              <strong style="color:#C6A75E">60 minutes</strong>.
+            </p>
+            <a href="{reset_url}"
+               style="display:inline-block;margin:28px 0;padding:14px 36px;
+                      background:linear-gradient(90deg,#C6A75E,#A38A4B);
+                      color:#1E1D1B;text-decoration:none;border-radius:50px;
+                      font-weight:700;font-size:14px;letter-spacing:0.05em">
+              Reset Password →
+            </a>
+            <p style="font-size:12px;color:#6a5a40;margin:16px 0 0">
+              If you didn't request this, you can safely ignore this email.
+              Your password will not change.
+            </p>
+            <hr style="border:none;border-top:1px solid rgba(198,167,94,0.15);margin:24px 0">
+            <p style="font-size:11px;color:#4a3a20">VocalArmor Security Team</p>
+          </div>
+        </body></html>
+        """
+
+        msg = MIMEMultipart("alternative")
+        msg["Subject"] = subject
+        msg["From"]    = f"VocalArmor <{GMAIL_SENDER}>"
+        msg["To"]      = to_email
+        msg.attach(MIMEText(html, "html"))
+
+        # Encode message in base64url format as required by Gmail API
+        raw = base64.urlsafe_b64encode(msg.as_bytes()).decode()
+        service.users().messages().send(
+            userId="me",
+            body={"raw": raw}
+        ).execute()
+
+        print(f"[EMAIL] Reset email sent to {to_email} via Gmail API")
+
     except Exception as e:
-        print(f"[EMAIL] Failed to send reset email: {e}")
+        print(f"[EMAIL] Failed to send reset email via Gmail API: {e}")
 
 
 #  6. Forgot password 
