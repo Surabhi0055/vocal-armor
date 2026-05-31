@@ -91,7 +91,7 @@ def register(body: RegisterRequest, db: Session = Depends(get_db)):
         return _build_token_response(db, user)
     except Exception as e:
         db.rollback()
-        return {"access_token": "", "refresh_token": "", "user": {"id": 0, "email": str(e), "full_name": str(type(e)), "username": "", "avatar_url": None, "is_active": False, "is_google_user": False}}
+        raise HTTPException(status_code=500, detail=f"Registration failed: {str(e)}")
 
 
 #  2. Login 

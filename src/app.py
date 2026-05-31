@@ -87,7 +87,7 @@ def health_check():
         "model_version":     "3.0",
         "supported_formats": sorted(ALLOWED_EXTENSIONS),
         "max_file_size_mb":  50,
-        "engine_loaded":     engine is not None,
+        "engine_loaded":     len(engines) > 0,
     }
 
 

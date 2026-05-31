@@ -159,6 +159,7 @@ const Dashboard = () => {
     setIsAnalyzing(true);
     setResult(null);
 
+    const apiUrl = import.meta.env.VITE_API_URL || 'http://localhost:8000';
     try {
       let response;
       if (activeTab === "file") {
@@ -166,7 +167,7 @@ const Dashboard = () => {
         const formData = new FormData();
         formData.append("file", file);
         formData.append("model", selectedModel);
-        response = await fetch("http://127.0.0.1:8000/predict", {
+        response = await fetch(`${apiUrl}/predict`, {
           method: "POST",
           body: formData,
         });
@@ -174,7 +175,7 @@ const Dashboard = () => {
         stopVisualizer();
         drawIdle();
         response = await fetch(
-          `http://127.0.0.1:8000/predict-url?url=${encodeURIComponent(url)}&model=${selectedModel}`,
+          `${apiUrl}/predict-url?url=${encodeURIComponent(url)}&model=${selectedModel}`,
           {
             method: "POST",
           },
