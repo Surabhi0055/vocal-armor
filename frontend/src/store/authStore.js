@@ -14,9 +14,19 @@ export const useAuthStore = create(
             isLoading: false,
             error: null,
 
-            setTokens: (access, refresh) => {
+            setTokens: (access, refresh, rememberMe = null) => {
                 set({ accessToken: access, refreshToken: refresh });
-                Cookies.set('va_refresh', refresh, { expires: 7, secure: false });
+                
+                // If rememberMe is not explicitly passed (e.g. during refresh), read from storage
+                const isRemembered = rememberMe !== null ? rememberMe : localStorage.getItem('va_remember') === 'true';
+
+                if (isRemembered) {
+                    Cookies.set('va_refresh', refresh, { expires: 7, secure: false });
+                    localStorage.setItem('va_remember', 'true');
+                } else {
+                    Cookies.set('va_refresh', refresh, { secure: false }); // session cookie
+                    localStorage.setItem('va_remember', 'false');
+                }
             },
 
             login: async (email, password, rememberMe) => {
@@ -27,7 +37,7 @@ export const useAuthStore = create(
                     });
                     const { access_token, refresh_token, user } = res.data;
                     set({ user, accessToken: access_token, isLoading: false });
-                    get().setTokens(access_token, refresh_token);
+                    get().setTokens(access_token, refresh_token, rememberMe);
                     return { success: true };
                 } catch (err) {
                     const msg = err.response?.data?.detail || 'Login failed';
@@ -61,6 +71,7 @@ export const useAuthStore = create(
                     } catch { }
                 }
                 Cookies.remove('va_refresh');
+                localStorage.removeItem('va_remember');
                 set({ user: null, accessToken: null, refreshToken: null });
                 // Notify all components that history has changed (now empty for next user)
                 window.dispatchEvent(new Event('va_history_updated'));
@@ -92,6 +103,10 @@ export const useAuthStore = create(
                 user: state.user,
                 accessToken: state.accessToken,
             }),
-        }
     )
 );
+
+// Auto-logout if session cookie expired (e.g. browser was closed and Remember Me was false)
+if (useAuthStore.getState().accessToken && !Cookies.get('va_refresh')) {
+    useAuthStore.getState().logout();
+}
