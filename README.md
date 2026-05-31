@@ -16,6 +16,13 @@
 
 ---
 
+## Live Demo
+
+**API & Backend Deployment:** [https://huggingface.co/spaces/surabhibh05/vocal-armor](https://huggingface.co/spaces/surabhibh05/vocal-armor)
+**Frontend Deployment:** [https://vocal-armor.vercel.app/](https://vocal-armor.vercel.app/)
+
+---
+
 ## Overview
 
 VocalArmor is a production-ready, full-stack deepfake voice detection system built to combat the growing threat of **AI voice cloning, synthetic audio fraud, and social engineering attacks**.
