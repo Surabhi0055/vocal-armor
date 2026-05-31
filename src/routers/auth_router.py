@@ -200,10 +200,13 @@ def send_reset_email(to_email: str, reset_url: str) -> None:
     </body></html>
     """
 
+    import email.utils
     msg = MIMEMultipart("alternative")
     msg["Subject"] = subject
     msg["From"]    = f"VocalArmor <{EMAIL_FROM}>"
     msg["To"]      = to_email
+    msg["Date"]    = email.utils.formatdate(localtime=True)
+    msg["Message-ID"] = email.utils.make_msgid()
     msg.attach(MIMEText(html, "html"))
 
     try:
