@@ -3,7 +3,7 @@ from fastapi.responses import RedirectResponse
 from fastapi.security import OAuth2PasswordRequestForm
 from sqlalchemy.orm import Session
 from datetime import datetime, timedelta
-import os, httpx, smtplib, secrets
+import os, httpx, smtplib, secrets, email.utils
 from email.mime.multipart import MIMEMultipart
 from email.mime.text import MIMEText
 
@@ -35,7 +35,7 @@ EMAIL_HOST     = os.getenv("EMAIL_HOST", "smtp.gmail.com")
 EMAIL_PORT     = int(os.getenv("EMAIL_PORT", 587))
 EMAIL_USER     = os.getenv("EMAIL_USER", "")
 EMAIL_PASSWORD = os.getenv("EMAIL_APP_PASSWORD", "")
-EMAIL_FROM     = os.getenv("EMAIL_FROM", EMAIL_USER)
+EMAIL_FROM     = EMAIL_USER  # Gmail requires From == authenticated user
 
 
 #  Helper 
@@ -165,9 +165,15 @@ def get_me(current_user: User = Depends(get_current_user)):
 
 # ─── Email Helper ────────────────────────────────────────────────────────────
 def send_reset_email(to_email: str, reset_url: str) -> None:
-    """Send a password reset email via Gmail SMTP (runs in a background thread)."""
+    """Send a password reset email via Gmail SMTP."""
+    print(f"[EMAIL] ── send_reset_email called ──")
+    print(f"[EMAIL] To:            {to_email}")
+    print(f"[EMAIL] EMAIL_USER:    {EMAIL_USER!r}")
+    print(f"[EMAIL] EMAIL_HOST:    {EMAIL_HOST}:{EMAIL_PORT}")
+    print(f"[EMAIL] PASSWORD set:  {bool(EMAIL_PASSWORD)}")
+
     if not EMAIL_USER or not EMAIL_PASSWORD:
-        print(f"[EMAIL] SMTP not configured — reset URL: {reset_url}")
+        print(f"[EMAIL] ERROR: SMTP credentials not set — reset URL: {reset_url}")
         return
 
     subject = "VocalArmor — Password Reset Request"
@@ -188,7 +194,7 @@ def send_reset_email(to_email: str, reset_url: str) -> None:
                   background:linear-gradient(135deg,rgba(255,92,43,0.8),rgba(29,207,207,0.8));
                   color:#fff;text-decoration:none;border-radius:10px;
                   font-weight:700;font-size:14px;letter-spacing:0.05em">
-          Reset Password →
+          Reset Password &rarr;
         </a>
         <p style="font-size:12px;color:#5a7a76;margin:16px 0 0">
           If you didn't request this, you can safely ignore this email.
@@ -200,24 +206,36 @@ def send_reset_email(to_email: str, reset_url: str) -> None:
     </body></html>
     """
 
-    import email.utils
     msg = MIMEMultipart("alternative")
-    msg["Subject"] = subject
-    msg["From"]    = f"VocalArmor <{EMAIL_FROM}>"
-    msg["To"]      = to_email
-    msg["Date"]    = email.utils.formatdate(localtime=True)
-    msg["Message-ID"] = email.utils.make_msgid()
+    msg["Subject"]    = subject
+    msg["From"]       = f"VocalArmor <{EMAIL_USER}>"
+    msg["To"]         = to_email
+    msg["Date"]       = email.utils.formatdate(localtime=True)
+    msg["Message-ID"] = email.utils.make_msgid(domain="gmail.com")
+
     msg.attach(MIMEText(html, "html"))
 
     try:
-        with smtplib.SMTP(EMAIL_HOST, EMAIL_PORT) as server:
+        print(f"[EMAIL] Connecting to {EMAIL_HOST}:{EMAIL_PORT} ...")
+        with smtplib.SMTP(EMAIL_HOST, EMAIL_PORT, timeout=20) as server:
             server.ehlo()
             server.starttls()
+            server.ehlo()
             server.login(EMAIL_USER, EMAIL_PASSWORD)
-            server.sendmail(EMAIL_FROM, to_email, msg.as_string())
-        print(f"[EMAIL] Reset email sent to {to_email}")
+            print(f"[EMAIL] Logged in. Sending to {to_email} ...")
+            server.sendmail(EMAIL_USER, [to_email], msg.as_string())
+        print(f"[EMAIL] ✓ Successfully sent to {to_email}")
+    except smtplib.SMTPAuthenticationError as e:
+        print(f"[EMAIL] ✗ Auth failed — check EMAIL_USER and EMAIL_APP_PASSWORD secrets: {e}")
+    except smtplib.SMTPRecipientsRefused as e:
+        print(f"[EMAIL] ✗ Recipient refused: {e}")
+    except smtplib.SMTPConnectError as e:
+        print(f"[EMAIL] ✗ Cannot connect to SMTP (port {EMAIL_PORT} may be blocked on this host): {e}")
+    except TimeoutError as e:
+        print(f"[EMAIL] ✗ Connection timed out (port {EMAIL_PORT} likely blocked on this host): {e}")
     except Exception as e:
-        print(f"[EMAIL] Failed to send reset email: {e}")
+        print(f"[EMAIL] ✗ Unexpected error — {type(e).__name__}: {e}")
+
 
 
 #  6. Forgot password 
