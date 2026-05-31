@@ -103,6 +103,7 @@ export const useAuthStore = create(
                 user: state.user,
                 accessToken: state.accessToken,
             }),
+        }
     )
 );
 
